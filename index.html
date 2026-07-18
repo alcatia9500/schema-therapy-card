@@ -119,7 +119,6 @@
     display: flex; align-items: center; gap: 10px; font-family: var(--serif);
     font-weight: 600; font-size: 1.12rem; letter-spacing: .06em; margin: 0 0 14px;
   }
-  .domain-dot { width: 12px; height: 12px; border-radius: 50%; flex: none; box-shadow: 0 0 0 3px var(--paper), 0 0 0 4px var(--line); }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 16px; }
   .card-pick {
     position: relative; aspect-ratio: 5 / 7; padding: 18px 14px 13px;
@@ -227,6 +226,17 @@
     .toolbar label span.tlabel { display: none; }
     input[type=range] { width: 90px; }
   }
+  /* --- 装飾 --- */
+  .ornament { display: flex; align-items: center; gap: 10px; width: min(240px, 60%); margin: 14px 0 0; color: var(--gold-soft); }
+  .ornament::before, .ornament::after { content: ""; flex: 1; height: 1px; background: currentColor; opacity: .7; }
+  .ornament i { width: 5px; height: 5px; background: currentColor; transform: rotate(45deg); flex: none; }
+  .chips { display: flex; gap: 4px; margin-top: 7px; align-items: center; }
+  .chip { width: 10px; height: 14px; border-radius: 2px; display: inline-block; }
+  .chip-more { font-size: .7rem; color: var(--ink-faint); margin-left: 2px; }
+  .domain-head::after { content: ""; flex: 1; height: 1px; background: var(--line); margin-left: 6px; }
+  .dh-sigil { display: inline-flex; color: var(--dc, var(--gold)); }
+  .dh-sigil svg { width: 18px; height: 18px; }
+
   /* --- モーション --- */
   @keyframes fade-in { from { opacity: 0; } }
   @keyframes card-rise { from { opacity: 0; transform: translateY(10px); } }
@@ -461,7 +471,8 @@ function renderHome(app) {
   const wrap = el("div", { class:"wrap" });
   wrap.appendChild(el("div", { class:"page-head" },
     el("h1", null, "スキーマ療法カード"),
-    el("p", { class:"subtitle" }, "気になるカードを選び、机の上に広げて、いまの自分を静かに見つめる。")
+    el("p", { class:"subtitle" }, "気になるカードを選び、机の上に広げて、いまの自分を静かに見つめる。"),
+    el("div", { class:"ornament" }, el("i"))
   ));
   wrap.appendChild(el("button", { class:"new-btn", onclick: () => { state.currentSessionId = createSession(); go("select"); } }, "＋ 新しいワークを始める"));
 
@@ -474,15 +485,25 @@ function renderHome(app) {
   } else {
     const list = el("div", { class:"session-list" });
     for (const s of sessions) {
+      const meta = el("div", { class:"meta" },
+        el("div", { class:"session-title", title:"クリックで名前を変更",
+          onclick: () => {
+            const t = prompt("ワークの名前", s.title);
+            if (t != null && t.trim()) { s.title = t.trim(); touchSession(s); saveDB(); render(); }
+          } }, s.title),
+        el("small", null, `${s.selectedCardIds.length}枚 ・ 更新 ${s.updatedAt.slice(0,16).replace("T"," ")}`)
+      );
+      if (s.selectedCardIds.length) {
+        const chips = el("span", { class:"chips" });
+        s.selectedCardIds.slice(0, 8).forEach(cid => {
+          const sc = schemaById(cid);
+          if (sc) chips.appendChild(el("i", { class:"chip", style:`background:var(--dom-${sc.domain})` }));
+        });
+        if (s.selectedCardIds.length > 8) chips.appendChild(el("span", { class:"chip-more" }, "+" + (s.selectedCardIds.length - 8)));
+        meta.appendChild(chips);
+      }
       list.appendChild(el("div", { class:"session-item" },
-        el("div", { class:"meta" },
-          el("div", { class:"session-title", title:"クリックで名前を変更",
-            onclick: () => {
-              const t = prompt("ワークの名前", s.title);
-              if (t != null && t.trim()) { s.title = t.trim(); touchSession(s); saveDB(); render(); }
-            } }, s.title),
-          el("small", null, `${s.selectedCardIds.length}枚 ・ 更新 ${s.updatedAt.slice(0,16).replace("T"," ")}`)
-        ),
+        meta,
         el("button", { onclick: () => { state.currentSessionId = s.id; go("canvas"); } }, "開く"),
         el("button", { class:"secondary", onclick: () => deleteSession(s.id) }, "削除")
       ));
@@ -501,7 +522,8 @@ function renderSelect(app) {
   const wrap = el("div", { class:"wrap" });
   wrap.appendChild(el("div", { class:"page-head" },
     el("h1", null, "当てはまるカードを選ぶ"),
-    el("p", { class:"subtitle" }, "今の自分に当てはまる、気になるカードを選んでください。数は多くても少なくてもかまいません。")
+    el("p", { class:"subtitle" }, "今の自分に当てはまる、気になるカードを選んでください。数は多くても少なくてもかまいません。"),
+    el("div", { class:"ornament" }, el("i"))
   ));
 
   const count = el("span", { class:"pick-count" }, el("b", null, String(chosen.size)), " 枚選択中");
@@ -517,10 +539,11 @@ function renderSelect(app) {
   let pickIndex = 0;
   for (const d of DOMAINS) {
     const section = el("div", { class:"domain-section" });
-    section.appendChild(el("div", { class:"domain-head" },
-      el("span", { class:"domain-dot", style:`background:var(--dom-${d.key})` }),
-      d.label
-    ));
+    const dh = el("div", { class:"domain-head", style:`--dc:var(--dom-${d.key})` });
+    const dsig = el("span", { class:"dh-sigil" });
+    dsig.innerHTML = SIGILS[d.key];
+    dh.append(dsig, document.createTextNode(d.label));
+    section.appendChild(dh);
     const grid = el("div", { class:"grid" });
     for (const s of SCHEMAS.filter(x => x.domain === d.key)) {
       const card = el("div", { class:"card-pick" + (chosen.has(s.id) ? " selected" : ""), style:`--dc:var(--dom-${d.key});--i:${pickIndex++}` },
