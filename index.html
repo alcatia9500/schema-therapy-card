@@ -124,7 +124,7 @@
   }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 16px; }
   .card-pick {
-    position: relative; aspect-ratio: 5 / 7; padding: 18px 14px 13px;
+    position: relative; padding: 18px 14px 13px;
     background: var(--card); background-image: var(--paper-tex);
     border: 1px solid rgba(120,100,70,.28); border-radius: 12px;
     box-shadow: var(--shadow-sm); cursor: pointer;
@@ -143,7 +143,17 @@
   .cf-sigil { display: inline-flex; }
   .cf-sigil svg { width: 20px; height: 20px; color: var(--dc, var(--gold)); display: block; }
   .cf-num { font-family: var(--serif); color: var(--gold); font-size: .78rem; letter-spacing: .14em; }
-  .cf-name { font-family: var(--serif); font-weight: 600; font-size: .95rem; line-height: 1.4; }
+  /* イラスト+重ね文字(画像は常に明色の紙調なので文字色は固定) */
+  .cf-art { position: relative; margin-top: 6px; border-radius: 6px; overflow: hidden; flex: none;
+    border: 1px solid rgba(120,100,70,.16); }
+  .cf-art img { display: block; width: 100%; aspect-ratio: 832 / 512; object-fit: cover;
+    user-select: none; -webkit-user-drag: none; pointer-events: none; }
+  .cf-word { position: absolute; font-family: var(--serif); font-weight: 600; color: #3a362e;
+    font-size: .92rem; letter-spacing: .08em; line-height: 1.35; text-align: left; white-space: nowrap;
+    text-shadow: 0 0 8px rgba(248,244,234,.95), 0 0 3px rgba(248,244,234,.9); }
+  .cf-word .wmain { display: block; font-size: 1em; }
+  .cf-word .wsub { display: block; font-size: .64em; color: #6e675a; letter-spacing: .14em; margin-top: 1px; }
+  .card-piece .cf-word { font-size: .76rem; }
   .cf-sep { width: 34px; height: 1px; background: var(--gold-soft); margin: 8px auto; position: relative; flex: none; }
   .cf-sep::after { content: ""; position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; background: var(--gold-soft); transform: translate(-50%,-50%) rotate(45deg); }
   .cf-desc { font-size: .74rem; color: var(--card-ink-soft); line-height: 1.6; flex: 1; }
@@ -180,7 +190,7 @@
   }
   .stage { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; }
   .card-piece {
-    position: absolute; width: 150px; height: 224px; margin-left: -75px; margin-top: -112px;
+    position: absolute; width: 150px; height: 256px; margin-left: -75px; margin-top: -128px;
     background: var(--card); background-image: var(--paper-tex);
     border: 1px solid rgba(93,79,58,.3); border-radius: 10px; padding: 16px 13px 11px;
     box-shadow:
@@ -265,43 +275,62 @@ const DOMAINS = [
   { key: "vigilance",     label: "V. 過剰警戒と抑制" },
 ];
 
+// art: 生成イラスト(img/{id}.jpg)への重ね文字。pos はイラストの余白に合わせた配置
 const SCHEMAS = [
   { id:"abandonment", name:"見捨てられ／不安定", domain:"disconnection",
-    desc:"支えてくれる人はいずれ去る、頼れない、と感じる。人との別れや不在に強い不安を覚える。" },
+    desc:"支えてくれる人はいずれ去る、頼れない、と感じる。人との別れや不在に強い不安を覚える。",
+    art:{ pos:"left:6%;top:9%", main:"見捨てられ", sub:"不安定" } },
   { id:"mistrust", name:"不信／虐待", domain:"disconnection",
-    desc:"他人はいつか自分を傷つけ、利用し、裏切ると身構える。人の善意を素直に受け取りにくい。" },
+    desc:"他人はいつか自分を傷つけ、利用し、裏切ると身構える。人の善意を素直に受け取りにくい。",
+    art:{ pos:"left:6%;top:6%", main:"不信／虐待" } },
   { id:"emotional-deprivation", name:"情緒的剥奪", domain:"disconnection",
-    desc:"必要な愛情・理解・保護が得られないと感じる。心の中がいつも満たされない。" },
+    desc:"必要な愛情・理解・保護が得られないと感じる。心の中がいつも満たされない。",
+    art:{ pos:"left:6%;bottom:7%", main:"情緒的剥奪" } },
   { id:"defectiveness", name:"欠陥／恥", domain:"disconnection",
-    desc:"自分は欠けていて価値がない、知られたら見捨てられると感じる。強い恥や自己否定を伴う。" },
+    desc:"自分は欠けていて価値がない、知られたら見捨てられると感じる。強い恥や自己否定を伴う。",
+    art:{ pos:"left:6%;top:5%", main:"欠陥／恥" } },
   { id:"social-isolation", name:"社会的孤立／疎外", domain:"disconnection",
-    desc:"自分はどの集団にも属せない、みんなと違う、と感じて孤立感を抱く。" },
+    desc:"自分はどの集団にも属せない、みんなと違う、と感じて孤立感を抱く。",
+    art:{ pos:"right:8%;top:16%;text-align:right", main:"社会的孤立", sub:"疎外" } },
   { id:"dependence", name:"依存／無能", domain:"autonomy",
-    desc:"助けなしには日常をこなせないと感じる。判断や行動を人に委ねがちになる。" },
+    desc:"助けなしには日常をこなせないと感じる。判断や行動を人に委ねがちになる。",
+    art:{ pos:"right:7%;top:10%;text-align:right", main:"依存／無能" } },
   { id:"vulnerability", name:"危険や病気に対する脆弱性", domain:"autonomy",
-    desc:"いつ災難・病気・破滅が起きるか分からないと過度に恐れ、備えや心配が絶えない。" },
+    desc:"いつ災難・病気・破滅が起きるか分からないと過度に恐れ、備えや心配が絶えない。",
+    art:{ pos:"left:6%;top:9%", main:"脆弱性", sub:"危険や病気に対する" } },
   { id:"enmeshment", name:"巻き込まれ／未発達の自己", domain:"autonomy",
-    desc:"身近な人と過度に一体化し、自分自身の考えや方向性が育ちにくい。" },
+    desc:"身近な人と過度に一体化し、自分自身の考えや方向性が育ちにくい。",
+    art:{ pos:"left:6%;top:8%", main:"巻き込まれ", sub:"未発達の自己" } },
   { id:"failure", name:"失敗", domain:"autonomy",
-    desc:"自分は同世代より劣り、何をやっても失敗すると感じる。挑戦を避けがちになる。" },
+    desc:"自分は同世代より劣り、何をやっても失敗すると感じる。挑戦を避けがちになる。",
+    art:{ pos:"left:7%;top:10%", main:"失敗" } },
   { id:"entitlement", name:"権利要求／尊大", domain:"limits",
-    desc:"自分は特別で制約を受けないと感じる。他者への配慮より自分の要求を優先しやすい。" },
+    desc:"自分は特別で制約を受けないと感じる。他者への配慮より自分の要求を優先しやすい。",
+    art:{ pos:"left:6%;top:7%", main:"権利要求", sub:"尊大" } },
   { id:"insufficient-self-control", name:"自制と自律の欠如", domain:"limits",
-    desc:"退屈や不快に耐えるのが難しく、衝動や感情を抑えて目標を追うのが苦手。" },
+    desc:"退屈や不快に耐えるのが難しく、衝動や感情を抑えて目標を追うのが苦手。",
+    art:{ pos:"left:6%;top:8%", main:"自制と自律の欠如" } },
   { id:"subjugation", name:"服従", domain:"directedness",
-    desc:"衝突や見捨てを避けるため、自分の欲求や感情を抑えて他者に従ってしまう。" },
+    desc:"衝突や見捨てを避けるため、自分の欲求や感情を抑えて他者に従ってしまう。",
+    art:{ pos:"left:7%;bottom:9%", main:"服従" } },
   { id:"self-sacrifice", name:"自己犠牲", domain:"directedness",
-    desc:"他者の苦痛を放っておけず、自分の必要を後回しにして尽くしすぎてしまう。" },
+    desc:"他者の苦痛を放っておけず、自分の必要を後回しにして尽くしすぎてしまう。",
+    art:{ pos:"left:6%;top:38%", main:"自己犠牲" } },
   { id:"approval-seeking", name:"評価と承認の希求", domain:"directedness",
-    desc:"他者からの評価・承認を過度に求め、それに合わせて自分を形づくってしまう。" },
+    desc:"他者からの評価・承認を過度に求め、それに合わせて自分を形づくってしまう。",
+    art:{ pos:"right:9%;top:56%;text-align:right;font-size:.7rem", main:"評価と承認の希求" } },
   { id:"negativity", name:"否定／悲観", domain:"vigilance",
-    desc:"物事の悪い面ばかりに目が向き、うまくいかない未来を強く予期してしまう。" },
+    desc:"物事の悪い面ばかりに目が向き、うまくいかない未来を強く予期してしまう。",
+    art:{ pos:"right:8%;top:42%;text-align:right", main:"否定／悲観" } },
   { id:"emotional-inhibition", name:"感情抑制", domain:"vigilance",
-    desc:"怒り・喜び・弱さなどの感情や衝動を、恥や制御のために抑え込んでしまう。" },
+    desc:"怒り・喜び・弱さなどの感情や衝動を、恥や制御のために抑え込んでしまう。",
+    art:{ pos:"left:32%;top:15%", main:"感情抑制" } },
   { id:"unrelenting-standards", name:"厳密な基準／過度の批判", domain:"vigilance",
-    desc:"非常に高い基準を自分(や他者)に課し、決して十分と思えず自分を厳しく批判する。" },
+    desc:"非常に高い基準を自分(や他者)に課し、決して十分と思えず自分を厳しく批判する。",
+    art:{ pos:"left:7%;top:32%", main:"厳密な基準", sub:"過度の批判" } },
   { id:"punitiveness", name:"罰", domain:"vigilance",
-    desc:"過ちは厳しく罰せられるべきだと考え、自分や他者のミスに寛容になれない。" },
+    desc:"過ちは厳しく罰せられるべきだと考え、自分や他者のミスに寛容になれない。",
+    art:{ pos:"left:8%;top:40%", main:"罰" } },
 ];
 
 // ==== 状態と永続化 ====
@@ -410,9 +439,14 @@ function cardFace(s) {
   const d = domainById(s.domain);
   const sigil = el("span", { class: "cf-sigil" });
   sigil.innerHTML = SIGILS[d.key];
+  const word = el("span", { class: "cf-word", style: s.art.pos },
+    el("span", { class: "wmain" }, s.art.main));
+  if (s.art.sub) word.appendChild(el("span", { class: "wsub" }, s.art.sub));
   return el("div", { class: "card-face" },
     el("div", { class: "cf-head" }, sigil, el("span", { class: "cf-num" }, ROMAN[_schemaIndex[s.id]])),
-    el("div", { class: "cf-name" }, s.name),
+    el("div", { class: "cf-art" },
+      el("img", { src: `img/${s.id}.jpg`, alt: s.name, draggable: "false" }),
+      word),
     el("span", { class: "cf-sep" }),
     el("div", { class: "cf-desc" }, s.desc),
     el("div", { class: "cf-domain" }, d.label)
