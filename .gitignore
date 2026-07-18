@@ -1,0 +1,6 @@
+# Claude Code のローカル作業ディレクトリ(ワークツリー・設定・プラグインキャッシュ等)
+.claude/
+
+# OS / エディタ
+.DS_Store
+Thumbs.db
