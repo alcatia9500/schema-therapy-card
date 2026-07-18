@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>スキーマ療法カード</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif; background:#f2efe9; color:#2b2b2b; }
+  #app { min-height: 100vh; }
+
+  button { font: inherit; cursor: pointer; border: none; border-radius: 8px; padding: 10px 16px; background:#3a7d7b; color:#fff; }
+  button.secondary { background:#e3ddd2; color:#2b2b2b; }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 24px 16px 80px; }
+  h1 { font-size: 1.4rem; }
+  .banner { background:#f6e2c9; border:1px solid #d9b98a; padding:10px 14px; border-radius:8px; margin-bottom:16px; font-size:.9rem; }
+  .session-item { display:flex; align-items:center; gap:12px; background:#fff; border:1px solid #e2ddd2; border-radius:12px; padding:14px 16px; margin-bottom:10px; }
+  .session-item .meta { flex:1; }
+  .session-item .meta small { color:#777; }
+  .empty { color:#777; padding:24px 0; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; }
+  .domain-head { grid-column:1/-1; font-weight:700; margin:18px 0 4px; padding-left:8px; border-left:5px solid; }
+  .card-pick { position:relative; background:#fff; border:2px solid #e2ddd2; border-radius:12px; padding:12px 14px; transition:transform .08s; }
+  .card-pick:hover { transform:translateY(-2px); }
+  .card-pick.selected { border-color:#3a7d7b; box-shadow:0 0 0 2px #3a7d7b33; }
+  .card-pick .cname { font-weight:700; margin-bottom:6px; }
+  .card-pick .cdesc { font-size:.82rem; color:#555; line-height:1.5; }
+  .card-pick .check { position:absolute; top:8px; right:10px; color:#3a7d7b; font-weight:700; display:none; }
+  .card-pick.selected .check { display:block; }
+  .pick-bar { position:fixed; left:0; right:0; bottom:0; background:#fffef9; border-top:1px solid #e2ddd2; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; }
+
+  .canvas-view { position:fixed; inset:0; overflow:hidden; background:#dcd6ca; perspective:1200px; touch-action:none; }
+  .stage { position:absolute; left:50%; top:50%; width:0; height:0; transform-style:preserve-3d; will-change:transform; }
+  .card-piece { position:absolute; width:150px; min-height:96px; margin-left:-75px; margin-top:-48px;
+    background:#fffdf7; border-radius:12px; border-top:6px solid #999; padding:10px 12px;
+    box-shadow:0 3px 8px rgba(0,0,0,.2); cursor:grab; user-select:none; }
+  .card-piece.dragging { cursor:grabbing; box-shadow:0 12px 24px rgba(0,0,0,.35); }
+  .card-piece .pname { font-weight:700; font-size:.86rem; margin-bottom:4px; }
+  .card-piece .pdesc { font-size:.72rem; color:#555; line-height:1.45; }
+  .toolbar { position:fixed; top:12px; left:12px; right:12px; display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+    background:#fffef9cc; backdrop-filter:blur(4px); border:1px solid #e2ddd2; border-radius:12px; padding:8px 12px; z-index:10; }
+  .toolbar .spacer { flex:1; }
+  .toolbar label { font-size:.8rem; display:flex; align-items:center; gap:6px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+"use strict";
+
+// ==== デッキデータ ====
+const DOMAINS = [
+  { key: "disconnection", label: "I. 断絶と拒絶", color: "#b5651d" },
+  { key: "autonomy",      label: "II. 自律性と行動の損傷", color: "#3a7d7b" },
+  { key: "limits",        label: "III. 制約の欠如", color: "#8a6d9e" },
+  { key: "directedness",  label: "IV. 他者への追従", color: "#4a7ba6" },
+  { key: "vigilance",     label: "V. 過剰警戒と抑制", color: "#7a8c46" },
+];
+
+const SCHEMAS = [
+  { id:"abandonment", name:"見捨てられ／不安定", domain:"disconnection",
+    desc:"支えてくれる人はいずれ去る、頼れない、と感じる。人との別れや不在に強い不安を覚える。" },
+  { id:"mistrust", name:"不信／虐待", domain:"disconnection",
+    desc:"他人はいつか自分を傷つけ、利用し、裏切ると身構える。人の善意を素直に受け取りにくい。" },
+  { id:"emotional-deprivation", name:"情緒的剥奪", domain:"disconnection",
+    desc:"必要な愛情・理解・保護が得られないと感じる。心の中がいつも満たされない。" },
+  { id:"defectiveness", name:"欠陥／恥", domain:"disconnection",
+    desc:"自分は欠けていて価値がない、知られたら見捨てられると感じる。強い恥や自己否定を伴う。" },
+  { id:"social-isolation", name:"社会的孤立／疎外", domain:"disconnection",
+    desc:"自分はどの集団にも属せない、みんなと違う、と感じて孤立感を抱く。" },
+  { id:"dependence", name:"依存／無能", domain:"autonomy",
+    desc:"助けなしには日常をこなせないと感じる。判断や行動を人に委ねがちになる。" },
+  { id:"vulnerability", name:"危険や病気に対する脆弱性", domain:"autonomy",
+    desc:"いつ災難・病気・破滅が起きるか分からないと過度に恐れ、備えや心配が絶えない。" },
+  { id:"enmeshment", name:"巻き込まれ／未発達の自己", domain:"autonomy",
+    desc:"身近な人と過度に一体化し、自分自身の考えや方向性が育ちにくい。" },
+  { id:"failure", name:"失敗", domain:"autonomy",
+    desc:"自分は同世代より劣り、何をやっても失敗すると感じる。挑戦を避けがちになる。" },
+  { id:"entitlement", name:"権利要求／尊大", domain:"limits",
+    desc:"自分は特別で制約を受けないと感じる。他者への配慮より自分の要求を優先しやすい。" },
+  { id:"insufficient-self-control", name:"自制と自律の欠如", domain:"limits",
+    desc:"退屈や不快に耐えるのが難しく、衝動や感情を抑えて目標を追うのが苦手。" },
+  { id:"subjugation", name:"服従", domain:"directedness",
+    desc:"衝突や見捨てを避けるため、自分の欲求や感情を抑えて他者に従ってしまう。" },
+  { id:"self-sacrifice", name:"自己犠牲", domain:"directedness",
+    desc:"他者の苦痛を放っておけず、自分の必要を後回しにして尽くしすぎてしまう。" },
+  { id:"approval-seeking", name:"評価と承認の希求", domain:"directedness",
+    desc:"他者からの評価・承認を過度に求め、それに合わせて自分を形づくってしまう。" },
+  { id:"negativity", name:"否定／悲観", domain:"vigilance",
+    desc:"物事の悪い面ばかりに目が向き、うまくいかない未来を強く予期してしまう。" },
+  { id:"emotional-inhibition", name:"感情抑制", domain:"vigilance",
+    desc:"怒り・喜び・弱さなどの感情や衝動を、恥や制御のために抑え込んでしまう。" },
+  { id:"unrelenting-standards", name:"厳密な基準／過度の批判", domain:"vigilance",
+    desc:"非常に高い基準を自分(や他者)に課し、決して十分と思えず自分を厳しく批判する。" },
+  { id:"punitiveness", name:"罰", domain:"vigilance",
+    desc:"過ちは厳しく罰せられるべきだと考え、自分や他者のミスに寛容になれない。" },
+];
+
+// ==== 状態と永続化 ====
+const STORAGE_KEY = "schemaTherapyCard.v1";
+const BACKUP_KEY = "schemaTherapyCard.v1.backup";
+const ZOOM_MIN = 0.3, ZOOM_MAX = 3.0, TILT_MIN = 0, TILT_MAX = 60;
+
+const state = {
+  db: { version: 1, sessions: [] },
+  currentSessionId: null,
+  screen: "home",
+  storageOK: true,
+};
+
+function genId() {
+  return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+}
+
+function loadDB() {
+  let raw;
+  try {
+    raw = localStorage.getItem(STORAGE_KEY);
+  } catch (e) {
+    state.storageOK = false;
+    return;
+  }
+  if (!raw) return;
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && parsed.version === 1 && Array.isArray(parsed.sessions)) {
+      state.db = parsed;
+    } else {
+      throw new Error("unexpected shape");
+    }
+  } catch (e) {
+    try { localStorage.setItem(BACKUP_KEY, raw); } catch (_) {}
+    state.db = { version: 1, sessions: [] };
+    state.corrupted = true;
+  }
+}
+
+function saveDB() {
+  if (!state.storageOK) return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.db));
+    state.saveError = false;
+  } catch (e) {
+    state.saveError = true;
+  }
+}
+
+let _saveTimer = null;
+function scheduleSave() {
+  if (_saveTimer) clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(saveDB, 500);
+}
+
+function getSession(id) {
+  return state.db.sessions.find(s => s.id === id) || null;
+}
+function getMaybe(id) {
+  return id ? getSession(id) : null;
+}
+function getCurrentSession() {
+  return getMaybe(state.currentSessionId);
+}
+function nowISO() {
+  return new Date().toISOString();
+}
+function touchSession(session) {
+  session.updatedAt = nowISO();
+}
+
+// ==== レンダリング共通 ====
+function el(tag, attrs, ...children) {
+  const node = document.createElement(tag);
+  if (attrs) for (const k in attrs) {
+    if (k === "class") node.className = attrs[k];
+    else if (k === "style") node.style.cssText = attrs[k];
+    else if (k.startsWith("on") && typeof attrs[k] === "function") node.addEventListener(k.slice(2), attrs[k]);
+    else if (attrs[k] != null) node.setAttribute(k, attrs[k]);
+  }
+  for (const c of children) {
+    if (c == null || c === false) continue;
+    node.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+  }
+  return node;
+}
+
+const _schemaMap = Object.fromEntries(SCHEMAS.map(s => [s.id, s]));
+const _domainMap = Object.fromEntries(DOMAINS.map(d => [d.key, d]));
+function schemaById(id){ return _schemaMap[id]; }
+function domainById(key){ return _domainMap[key]; }
+
+function clamp(n, lo, hi){ return Math.max(lo, Math.min(hi, n)); }
+
+function go(screen) {
+  state.screen = screen;
+  render();
+}
+
+function render() {
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+  const banner = warningBanner();
+  if (banner) app.appendChild(banner);
+  if (state.screen === "home") renderHome(app);
+  else if (state.screen === "select") renderSelect(app);
+  else if (state.screen === "canvas") renderCanvas(app);
+}
+
+function warningBanner() {
+  let msg = null;
+  if (!state.storageOK) msg = "ブラウザの保存領域が使えません。作業はこのタブを閉じると消えます。";
+  else if (state.corrupted) msg = "保存データが壊れていたため初期化しました(バックアップを退避済み)。";
+  else if (state.saveError) msg = "保存に失敗しました。空き容量をご確認ください。";
+  if (!msg) return null;
+  return el("div", { class:"banner" }, msg);
+}
+
+// ==== ホーム画面 ====
+function defaultTitle() {
+  const d = new Date();
+  const p = n => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} のワーク`;
+}
+
+function createSession() {
+  const id = genId();
+  const t = nowISO();
+  state.db.sessions.push({
+    id, title: defaultTitle(), createdAt: t, updatedAt: t,
+    selectedCardIds: [], placements: {}, view: { zoom:1, tilt:0, panX:0, panY:0 },
+  });
+  saveDB();
+  return id;
+}
+
+function deleteSession(id) {
+  if (!confirm("このワークを削除しますか?")) return;
+  state.db.sessions = state.db.sessions.filter(s => s.id !== id);
+  saveDB();
+  render();
+}
+
+function renderHome(app) {
+  const wrap = el("div", { class:"wrap" });
+  wrap.appendChild(el("h1", null, "スキーマ療法カード"));
+  wrap.appendChild(el("button", { onclick: () => { state.currentSessionId = createSession(); go("select"); } }, "新しいワークを始める"));
+
+  const sessions = [...state.db.sessions].sort((a,b) => b.updatedAt.localeCompare(a.updatedAt));
+  if (sessions.length === 0) {
+    wrap.appendChild(el("p", { class:"empty" }, "まだワークがありません。上のボタンから始めましょう。"));
+  } else {
+    const list = el("div", { style:"margin-top:20px" });
+    for (const s of sessions) {
+      list.appendChild(el("div", { class:"session-item" },
+        el("div", { class:"meta" },
+          el("div", { style:"cursor:text", title:"クリックで名前を変更",
+            onclick: () => {
+              const t = prompt("ワークの名前", s.title);
+              if (t != null && t.trim()) { s.title = t.trim(); touchSession(s); saveDB(); render(); }
+            } }, s.title),
+          el("small", null, `${s.selectedCardIds.length}枚 ・ 更新 ${s.updatedAt.slice(0,16).replace("T"," ")}`)
+        ),
+        el("button", { onclick: () => { state.currentSessionId = s.id; go("canvas"); } }, "開く"),
+        el("button", { class:"secondary", onclick: () => deleteSession(s.id) }, "削除")
+      ));
+    }
+    wrap.appendChild(list);
+  }
+  app.appendChild(wrap);
+}
+
+// ==== カード選択画面 ====
+function renderSelect(app) {
+  const session = getCurrentSession();
+  if (!session) { go("home"); return; }
+  const chosen = new Set(session.selectedCardIds);
+
+  const wrap = el("div", { class:"wrap" });
+  wrap.appendChild(el("h1", null, "当てはまるカードを選ぶ"));
+  wrap.appendChild(el("p", { style:"color:#666;margin-top:-6px" }, "今の自分に当てはまる、気になるカードを選んでください。"));
+
+  const count = el("span", null, `${chosen.size}枚選択中`);
+  const confirmBtn = el("button", { onclick: () => {
+    session.selectedCardIds = SCHEMAS.filter(s => chosen.has(s.id)).map(s => s.id);
+    reconcilePlacements(session);
+    touchSession(session);
+    saveDB();
+    go("canvas");
+  } }, "確定");
+
+  const grid = el("div", { class:"grid" });
+  for (const d of DOMAINS) {
+    grid.appendChild(el("div", { class:"domain-head", style:`border-color:${d.color}` }, d.label));
+    for (const s of SCHEMAS.filter(x => x.domain === d.key)) {
+      const card = el("div", { class:"card-pick" + (chosen.has(s.id) ? " selected" : "") },
+        el("span", { class:"check" }, "✓"),
+        el("div", { class:"cname" }, s.name),
+        el("div", { class:"cdesc" }, s.desc)
+      );
+      card.addEventListener("click", () => {
+        if (chosen.has(s.id)) chosen.delete(s.id); else chosen.add(s.id);
+        card.classList.toggle("selected");
+        count.textContent = `${chosen.size}枚選択中`;
+        confirmBtn.disabled = chosen.size === 0;
+      });
+      grid.appendChild(card);
+    }
+  }
+  wrap.appendChild(grid);
+  app.appendChild(wrap);
+
+  confirmBtn.disabled = chosen.size === 0;
+  const backBtn = el("button", { class:"secondary", onclick: () => go(state.db.sessions.length ? "home" : "select") }, "ホームへ");
+  app.appendChild(el("div", { class:"pick-bar" }, backBtn, count, confirmBtn));
+}
+
+// ==== ワークキャンバス ====
+function reconcilePlacements(session) {
+  const selected = session.selectedCardIds;
+  const kept = {};
+  let maxZ = 0;
+  // 継続カード: 座標・z を維持
+  selected.forEach(id => {
+    if (session.placements[id]) {
+      kept[id] = session.placements[id];
+      maxZ = Math.max(maxZ, kept[id].z || 0);
+    }
+  });
+  // 新規カード: 中央付近にグリッド整列
+  const newIds = selected.filter(id => !kept[id]);
+  const cols = Math.ceil(Math.sqrt(newIds.length)) || 1;
+  const rows = Math.ceil(newIds.length / cols) || 1;
+  const gapX = 170, gapY = 120;
+  newIds.forEach((id, i) => {
+    const r = Math.floor(i / cols), c = i % cols;
+    const x = (c - (cols - 1) / 2) * gapX;
+    const y = (r - (rows - 1) / 2) * gapY;
+    maxZ += 1;
+    kept[id] = { x, y, z: maxZ };
+  });
+  session.placements = kept;
+}
+
+let stageEl = null, viewportEl = null;
+
+function applyStageTransform() {
+  const v = getCurrentSession().view;
+  stageEl.style.transform =
+    `rotateX(${v.tilt}deg) scale(${v.zoom}) translate(${v.panX}px, ${v.panY}px)`;
+}
+
+function bringToFront(session, id) {
+  let maxZ = 0;
+  for (const k in session.placements) maxZ = Math.max(maxZ, session.placements[k].z);
+  session.placements[id].z = maxZ + 1;
+}
+
+function positionPiece(piece, p) {
+  piece.style.left = p.x + "px";
+  piece.style.top = p.y + "px";
+  piece.style.zIndex = p.z;
+}
+
+function renderCanvas(app) {
+  const session = getCurrentSession();
+  if (!session) { go("home"); return; }
+  if (session.selectedCardIds.length === 0) { go("select"); return; }
+
+  viewportEl = el("div", { class:"canvas-view" });
+  stageEl = el("div", { class:"stage" });
+  viewportEl.appendChild(stageEl);
+
+  for (const id of session.selectedCardIds) {
+    const s = schemaById(id);
+    const p = session.placements[id];
+    const piece = el("div", { class:"card-piece" },
+      el("div", { class:"pname" }, s.name),
+      el("div", { class:"pdesc" }, s.desc)
+    );
+    piece.style.borderTopColor = domainById(s.domain).color;
+    piece.dataset.id = id;
+    positionPiece(piece, p);
+    attachCardDrag(piece, session);
+    stageEl.appendChild(piece);
+  }
+
+  app.appendChild(viewportEl);
+  app.appendChild(buildToolbar(session));
+  applyStageTransform();
+  attachViewControls(session);
+}
+
+function buildToolbar(session) {
+  const v = session.view;
+  const zoomOut = el("button", { class:"secondary", onclick: () => nudgeZoom(session, -0.15) }, "−");
+  const zoomIn  = el("button", { class:"secondary", onclick: () => nudgeZoom(session, 0.15) }, "+");
+
+  const tilt = el("input", { type:"range", min:TILT_MIN, max:TILT_MAX, value:v.tilt, step:1 });
+  tilt.addEventListener("input", () => {
+    session.view.tilt = clamp(+tilt.value, TILT_MIN, TILT_MAX);
+    applyStageTransform(); touchSession(session); scheduleSave();
+  });
+
+  const reset = el("button", { class:"secondary", onclick: () => {
+    session.view = { zoom:1, tilt:0, panX:0, panY:0 };
+    tilt.value = 0; applyStageTransform(); touchSession(session); scheduleSave();
+  } }, "視点リセット");
+
+  const reselect = el("button", { class:"secondary", onclick: () => go("select") }, "カードを選び直す");
+  const home = el("button", { class:"secondary", onclick: () => go("home") }, "ホームへ");
+
+  return el("div", { class:"toolbar" },
+    home, reselect,
+    el("span", { class:"spacer" }),
+    el("label", null, "ズーム", zoomOut, zoomIn),
+    el("label", null, "傾き", tilt),
+    reset
+  );
+}
+
+function nudgeZoom(session, delta) {
+  session.view.zoom = clamp(session.view.zoom + delta, ZOOM_MIN, ZOOM_MAX);
+  applyStageTransform(); touchSession(session); scheduleSave();
+}
+
+// ==== ドラッグ移動と視点操作 ====
+function screenDeltaToStage(dx, dy, view) {
+  const rad = view.tilt * Math.PI / 180;
+  const cos = Math.max(Math.cos(rad), 0.2); // 0除算/過大補正の下限
+  return { x: dx / view.zoom, y: dy / (view.zoom * cos) };
+}
+
+function attachCardDrag(piece, session) {
+  const id = piece.dataset.id;
+  let startX = 0, startY = 0, origX = 0, origY = 0, dragging = false;
+
+  piece.addEventListener("pointerdown", (e) => {
+    e.stopPropagation(); // viewport のパンを起こさない
+    dragging = true;
+    piece.setPointerCapture(e.pointerId);
+    piece.classList.add("dragging");
+    startX = e.clientX; startY = e.clientY;
+    const p = session.placements[id];
+    origX = p.x; origY = p.y;
+    bringToFront(session, id);
+    piece.style.zIndex = session.placements[id].z;
+  });
+
+  piece.addEventListener("pointermove", (e) => {
+    if (!dragging) return;
+    const d = screenDeltaToStage(e.clientX - startX, e.clientY - startY, session.view);
+    const p = session.placements[id];
+    p.x = origX + d.x;
+    p.y = origY + d.y;
+    positionPiece(piece, p);
+  });
+
+  const end = () => {
+    if (!dragging) return;
+    dragging = false;
+    piece.classList.remove("dragging");
+    touchSession(session);
+    scheduleSave();
+  };
+  piece.addEventListener("pointerup", end);
+  piece.addEventListener("pointercancel", end);
+}
+
+function attachViewControls(session) {
+  // ホイールズーム(簡易に中心ズーム)
+  viewportEl.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 0.1 : -0.1;
+    session.view.zoom = clamp(session.view.zoom + delta, ZOOM_MIN, ZOOM_MAX);
+    applyStageTransform(); touchSession(session); scheduleSave();
+  }, { passive:false });
+
+  // 余白ドラッグでパン
+  let panning = false, sx = 0, sy = 0, opx = 0, opy = 0;
+  viewportEl.addEventListener("pointerdown", (e) => {
+    if (e.target !== viewportEl && e.target !== stageEl) return; // カード上は除外
+    panning = true;
+    viewportEl.setPointerCapture(e.pointerId);
+    sx = e.clientX; sy = e.clientY;
+    opx = session.view.panX; opy = session.view.panY;
+  });
+  viewportEl.addEventListener("pointermove", (e) => {
+    if (!panning) return;
+    session.view.panX = opx + (e.clientX - sx) / session.view.zoom;
+    session.view.panY = opy + (e.clientY - sy) / session.view.zoom;
+    applyStageTransform();
+  });
+  const endPan = () => { if (panning) { panning = false; touchSession(session); scheduleSave(); } };
+  viewportEl.addEventListener("pointerup", endPan);
+  viewportEl.addEventListener("pointercancel", endPan);
+
+  attachPinch(session);
+}
+
+function attachPinch(session) {
+  const pts = new Map();
+  let baseDist = 0, baseZoom = 1;
+  viewportEl.addEventListener("pointerdown", (e) => {
+    pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
+    if (pts.size === 2) {
+      const [a, b] = [...pts.values()];
+      baseDist = Math.hypot(a.x - b.x, a.y - b.y);
+      baseZoom = session.view.zoom;
+    }
+  });
+  viewportEl.addEventListener("pointermove", (e) => {
+    if (!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
+    if (pts.size === 2 && baseDist > 0) {
+      const [a, b] = [...pts.values()];
+      const dist = Math.hypot(a.x - b.x, a.y - b.y);
+      session.view.zoom = clamp(baseZoom * (dist / baseDist), ZOOM_MIN, ZOOM_MAX);
+      applyStageTransform();
+    }
+  });
+  const drop = (e) => {
+    if (pts.has(e.pointerId)) { pts.delete(e.pointerId); baseDist = 0; touchSession(session); scheduleSave(); }
+  };
+  viewportEl.addEventListener("pointerup", drop);
+  viewportEl.addEventListener("pointercancel", drop);
+}
+
+// ==== 起動 ====
+loadDB();
+if (state.db.sessions.length === 0) {
+  state.currentSessionId = createSession();
+  state.screen = "select";
+} else {
+  state.screen = "home";
+}
+render();
+</script>
+</body>
+</html>
