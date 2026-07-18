@@ -190,7 +190,7 @@
   }
   .stage { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; }
   .card-piece {
-    position: absolute; width: 150px; height: 256px; margin-left: -75px; margin-top: -128px;
+    position: absolute; width: 150px; min-height: 256px; margin-left: -75px; margin-top: -128px;
     background: var(--card); background-image: var(--paper-tex);
     border: 1px solid rgba(93,79,58,.3); border-radius: 10px; padding: 16px 13px 11px;
     box-shadow:
@@ -204,7 +204,7 @@
     border-radius: 6px; pointer-events: none;
   }
   .card-piece .cf-name { font-size: .88rem; }
-  .card-piece .cf-desc { font-size: .68rem; overflow: hidden; }
+  .card-piece .cf-desc { font-size: .68rem; }
   .card-piece:hover { box-shadow: 0 calc(6px + 16px * var(--tiltf, 0)) calc(16px + 22px * var(--tiltf, 0)) rgba(35,26,12,.4), 0 3px 6px rgba(35,26,12,.2); }
   .card-piece.dragging { cursor: grabbing; transform: scale(1.05) rotate(.8deg);
     box-shadow: 0 calc(10px + 18px * var(--tiltf, 0)) calc(24px + 24px * var(--tiltf, 0)) rgba(35,26,12,.45), 0 4px 8px rgba(35,26,12,.22); }
@@ -621,7 +621,7 @@ function reconcilePlacements(session) {
   const newIds = selected.filter(id => !kept[id]);
   const cols = Math.ceil(Math.sqrt(newIds.length)) || 1;
   const rows = Math.ceil(newIds.length / cols) || 1;
-  const gapX = 175, gapY = 255;
+  const gapX = 182, gapY = 300;
   newIds.forEach((id, i) => {
     const r = Math.floor(i / cols), c = i % cols;
     const x = (c - (cols - 1) / 2) * gapX;
