@@ -120,22 +120,32 @@
     font-weight: 600; font-size: 1.12rem; letter-spacing: .06em; margin: 0 0 14px;
   }
   .domain-dot { width: 12px; height: 12px; border-radius: 50%; flex: none; box-shadow: 0 0 0 3px var(--paper), 0 0 0 4px var(--line); }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(216px, 1fr)); gap: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 16px; }
   .card-pick {
-    position: relative; background: var(--card); border: 1.5px solid var(--line);
-    border-radius: 16px; padding: 16px 16px 16px 20px; box-shadow: var(--shadow-sm);
-    cursor: pointer; overflow: hidden;
+    position: relative; aspect-ratio: 5 / 7; padding: 18px 14px 13px;
+    background: var(--card); background-image: var(--paper-tex);
+    border: 1px solid rgba(120,100,70,.28); border-radius: 12px;
+    box-shadow: var(--shadow-sm); cursor: pointer;
     transition: transform .14s ease, box-shadow .18s ease, border-color .18s ease;
   }
   .card-pick::before {
-    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
-    background: var(--dc, #ccc); opacity: .85; transition: width .16s ease;
+    content: ""; position: absolute; inset: 6px; border: 1px solid var(--frame);
+    border-radius: 8px; pointer-events: none;
   }
   .card-pick:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
   .card-pick.selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-tint), var(--shadow-md); }
-  .card-pick.selected::before { width: 8px; }
-  .card-pick .cname { font-weight: 700; margin-bottom: 7px; font-size: .98rem; padding-right: 26px; }
-  .card-pick .cdesc { font-size: .82rem; color: var(--ink-soft); line-height: 1.65; }
+
+  /* カード面(選択・机 共通) */
+  .card-face { display: flex; flex-direction: column; height: 100%; text-align: center; color: var(--card-ink); position: relative; }
+  .cf-head { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-bottom: 6px; }
+  .cf-sigil { display: inline-flex; }
+  .cf-sigil svg { width: 20px; height: 20px; color: var(--dc, var(--gold)); display: block; }
+  .cf-num { font-family: var(--serif); color: var(--gold); font-size: .78rem; letter-spacing: .14em; }
+  .cf-name { font-family: var(--serif); font-weight: 600; font-size: .95rem; line-height: 1.4; }
+  .cf-sep { width: 34px; height: 1px; background: var(--gold-soft); margin: 8px auto; position: relative; flex: none; }
+  .cf-sep::after { content: ""; position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; background: var(--gold-soft); transform: translate(-50%,-50%) rotate(45deg); }
+  .cf-desc { font-size: .74rem; color: var(--card-ink-soft); line-height: 1.6; flex: 1; }
+  .cf-domain { font-size: .62rem; letter-spacing: .1em; color: var(--dc, var(--gold)); margin-top: 8px; opacity: .85; }
   .card-pick .check {
     position: absolute; top: 12px; right: 12px; width: 22px; height: 22px; border-radius: 50%;
     background: var(--accent); color: #fff; font-size: .74rem; font-weight: 700;
@@ -167,20 +177,20 @@
   }
   .stage { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; }
   .card-piece {
-    position: absolute; width: 168px; min-height: 104px; margin-left: -84px; margin-top: -52px;
-    background: var(--card); border-radius: 14px; padding: 14px 15px 15px;
-    border: 1px solid rgba(61,58,52,.06); border-top: 5px solid var(--dc, #999);
+    position: absolute; width: 150px; height: 210px; margin-left: -75px; margin-top: -105px;
+    background: var(--card); background-image: var(--paper-tex);
+    border: 1px solid rgba(93,79,58,.3); border-radius: 10px; padding: 16px 13px 11px;
     box-shadow: var(--shadow-md); cursor: grab; user-select: none;
     transition: box-shadow .18s ease, transform .12s ease;
   }
+  .card-piece::before {
+    content: ""; position: absolute; inset: 5px; border: 1px solid var(--frame);
+    border-radius: 6px; pointer-events: none;
+  }
+  .card-piece .cf-name { font-size: .88rem; }
+  .card-piece .cf-desc { font-size: .68rem; overflow: hidden; }
   .card-piece:hover { box-shadow: var(--shadow-lg); }
   .card-piece.dragging { cursor: grabbing; box-shadow: var(--shadow-lg); transform: scale(1.04); }
-  .card-piece .pdomain {
-    font-size: .64rem; font-weight: 700; letter-spacing: .08em; color: var(--dc, #999);
-    text-transform: none; margin-bottom: 4px; opacity: .9;
-  }
-  .card-piece .pname { font-family: var(--serif); font-weight: 600; font-size: .92rem; margin-bottom: 6px; line-height: 1.35; }
-  .card-piece .pdesc { font-size: .72rem; color: var(--ink-soft); line-height: 1.55; }
 
   .toolbar {
     position: fixed; top: 14px; left: 14px; right: 14px; z-index: 10;
@@ -360,6 +370,29 @@ const _domainMap = Object.fromEntries(DOMAINS.map(d => [d.key, d]));
 function schemaById(id){ return _schemaMap[id]; }
 function domainById(key){ return _domainMap[key]; }
 
+// ==== カード面(共通意匠) ====
+const ROMAN = ["Ⅰ","Ⅱ","Ⅲ","Ⅳ","Ⅴ","Ⅵ","Ⅶ","Ⅷ","Ⅸ","Ⅹ","Ⅺ","Ⅻ","ⅩⅢ","ⅩⅣ","ⅩⅤ","ⅩⅥ","ⅩⅦ","ⅩⅧ"];
+const _schemaIndex = Object.fromEntries(SCHEMAS.map((s, i) => [s.id, i]));
+const SIGILS = {
+  disconnection: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.6 3.4a9 9 0 1 1-5.2 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+  autonomy: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20v-8m0 0c0-4-2.6-6.4-6.5-6.4C5.6 9.6 8 12 12 12zm0 0c0-4 2.6-6.4 6.5-6.4C18.4 9.6 16 12 12 12z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>',
+  limits: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15m-7 1h14M5 8h14M5 8l-2.4 5a2.6 2.6 0 0 0 4.8 0zM19 8l-2.4 5a2.6 2.6 0 0 0 4.8 0z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  directedness: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9.5" cy="12" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="14.5" cy="12" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>',
+  vigilance: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 16.5l5-9 3.8 6.2 2.7-4.2 5.5 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+};
+function cardFace(s) {
+  const d = domainById(s.domain);
+  const sigil = el("span", { class: "cf-sigil" });
+  sigil.innerHTML = SIGILS[d.key];
+  return el("div", { class: "card-face" },
+    el("div", { class: "cf-head" }, sigil, el("span", { class: "cf-num" }, ROMAN[_schemaIndex[s.id]])),
+    el("div", { class: "cf-name" }, s.name),
+    el("span", { class: "cf-sep" }),
+    el("div", { class: "cf-desc" }, s.desc),
+    el("div", { class: "cf-domain" }, d.label)
+  );
+}
+
 function clamp(n, lo, hi){ return Math.max(lo, Math.min(hi, n)); }
 
 function go(screen) {
@@ -478,8 +511,7 @@ function renderSelect(app) {
     for (const s of SCHEMAS.filter(x => x.domain === d.key)) {
       const card = el("div", { class:"card-pick" + (chosen.has(s.id) ? " selected" : ""), style:`--dc:var(--dom-${d.key})` },
         el("span", { class:"check" }, "✓"),
-        el("div", { class:"cname" }, s.name),
-        el("div", { class:"cdesc" }, s.desc)
+        cardFace(s)
       );
       card.addEventListener("click", () => {
         if (chosen.has(s.id)) chosen.delete(s.id); else chosen.add(s.id);
@@ -515,7 +547,7 @@ function reconcilePlacements(session) {
   const newIds = selected.filter(id => !kept[id]);
   const cols = Math.ceil(Math.sqrt(newIds.length)) || 1;
   const rows = Math.ceil(newIds.length / cols) || 1;
-  const gapX = 170, gapY = 120;
+  const gapX = 175, gapY = 245;
   newIds.forEach((id, i) => {
     const r = Math.floor(i / cols), c = i % cols;
     const x = (c - (cols - 1) / 2) * gapX;
@@ -559,11 +591,7 @@ function renderCanvas(app) {
     const s = schemaById(id);
     const d = domainById(s.domain);
     const p = session.placements[id];
-    const piece = el("div", { class:"card-piece", style:`--dc:var(--dom-${d.key})` },
-      el("div", { class:"pdomain" }, d.label),
-      el("div", { class:"pname" }, s.name),
-      el("div", { class:"pdesc" }, s.desc)
-    );
+    const piece = el("div", { class:"card-piece", style:`--dc:var(--dom-${d.key})` }, cardFace(s));
     piece.dataset.id = id;
     positionPiece(piece, p);
     attachCardDrag(piece, session);
