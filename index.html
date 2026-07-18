@@ -168,19 +168,23 @@
   .canvas-view {
     position: fixed; inset: 0; overflow: hidden; touch-action: none; perspective: 1300px;
     background:
-      radial-gradient(120% 90% at 50% 8%, #e9e2d3 0%, #ddd4c2 46%, #cabfa8 100%);
+      var(--wood-tex),
+      radial-gradient(120% 90% at 50% 6%, var(--desk-a) 0%, var(--desk-b) 48%, var(--desk-c) 100%);
   }
   .canvas-view::after {
     content: ""; position: absolute; inset: 0; pointer-events: none;
-    box-shadow: inset 0 0 220px rgba(90,74,48,.28);
-    background: radial-gradient(80% 70% at 50% 42%, transparent 60%, rgba(90,74,48,.12) 100%);
+    box-shadow: inset 0 0 260px rgba(40,28,10,.38);
+    background: radial-gradient(80% 70% at 50% 40%, transparent 55%, rgba(40,28,10,.16) 100%);
   }
   .stage { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; }
   .card-piece {
     position: absolute; width: 150px; height: 210px; margin-left: -75px; margin-top: -105px;
     background: var(--card); background-image: var(--paper-tex);
     border: 1px solid rgba(93,79,58,.3); border-radius: 10px; padding: 16px 13px 11px;
-    box-shadow: var(--shadow-md); cursor: grab; user-select: none;
+    box-shadow:
+      0 calc(2px + 16px * var(--tiltf, 0)) calc(10px + 22px * var(--tiltf, 0)) rgba(35,26,12,.35),
+      0 2px 4px rgba(35,26,12,.18);
+    cursor: grab; user-select: none;
     transition: box-shadow .18s ease, transform .12s ease;
   }
   .card-piece::before {
@@ -189,8 +193,9 @@
   }
   .card-piece .cf-name { font-size: .88rem; }
   .card-piece .cf-desc { font-size: .68rem; overflow: hidden; }
-  .card-piece:hover { box-shadow: var(--shadow-lg); }
-  .card-piece.dragging { cursor: grabbing; box-shadow: var(--shadow-lg); transform: scale(1.04); }
+  .card-piece:hover { box-shadow: 0 calc(6px + 16px * var(--tiltf, 0)) calc(16px + 22px * var(--tiltf, 0)) rgba(35,26,12,.4), 0 3px 6px rgba(35,26,12,.2); }
+  .card-piece.dragging { cursor: grabbing; transform: scale(1.05) rotate(.8deg);
+    box-shadow: 0 calc(10px + 18px * var(--tiltf, 0)) calc(24px + 24px * var(--tiltf, 0)) rgba(35,26,12,.45), 0 4px 8px rgba(35,26,12,.22); }
 
   .toolbar {
     position: fixed; top: 14px; left: 14px; right: 14px; z-index: 10;
@@ -222,7 +227,15 @@
     .toolbar label span.tlabel { display: none; }
     input[type=range] { width: 90px; }
   }
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  /* --- モーション --- */
+  @keyframes fade-in { from { opacity: 0; } }
+  @keyframes card-rise { from { opacity: 0; transform: translateY(10px); } }
+  @keyframes card-deal { from { opacity: 0; transform: translateY(16px) scale(1.06); } }
+  .wrap, .canvas-view, .toolbar { animation: fade-in .18s ease both; }
+  .card-pick { animation: card-rise .35s ease backwards; animation-delay: calc(var(--i, 0) * 24ms); }
+  .card-piece { animation: card-deal .4s cubic-bezier(.22,.9,.34,1) backwards; animation-delay: calc(var(--i, 0) * 55ms); }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 </head>
 <body>
@@ -501,6 +514,7 @@ function renderSelect(app) {
     go("canvas");
   } }, "確定");
 
+  let pickIndex = 0;
   for (const d of DOMAINS) {
     const section = el("div", { class:"domain-section" });
     section.appendChild(el("div", { class:"domain-head" },
@@ -509,7 +523,7 @@ function renderSelect(app) {
     ));
     const grid = el("div", { class:"grid" });
     for (const s of SCHEMAS.filter(x => x.domain === d.key)) {
-      const card = el("div", { class:"card-pick" + (chosen.has(s.id) ? " selected" : ""), style:`--dc:var(--dom-${d.key})` },
+      const card = el("div", { class:"card-pick" + (chosen.has(s.id) ? " selected" : ""), style:`--dc:var(--dom-${d.key});--i:${pickIndex++}` },
         el("span", { class:"check" }, "✓"),
         cardFace(s)
       );
@@ -564,6 +578,7 @@ function applyStageTransform() {
   const v = getCurrentSession().view;
   stageEl.style.transform =
     `rotateX(${v.tilt}deg) scale(${v.zoom}) translate(${v.panX}px, ${v.panY}px)`;
+  viewportEl.style.setProperty("--tiltf", (v.tilt / TILT_MAX).toFixed(3));
 }
 
 function bringToFront(session, id) {
@@ -587,16 +602,16 @@ function renderCanvas(app) {
   stageEl = el("div", { class:"stage" });
   viewportEl.appendChild(stageEl);
 
-  for (const id of session.selectedCardIds) {
+  session.selectedCardIds.forEach((id, i) => {
     const s = schemaById(id);
     const d = domainById(s.domain);
     const p = session.placements[id];
-    const piece = el("div", { class:"card-piece", style:`--dc:var(--dom-${d.key})` }, cardFace(s));
+    const piece = el("div", { class:"card-piece", style:`--dc:var(--dom-${d.key});--i:${i}` }, cardFace(s));
     piece.dataset.id = id;
     positionPiece(piece, p);
     attachCardDrag(piece, session);
     stageEl.appendChild(piece);
-  }
+  });
 
   app.appendChild(viewportEl);
   app.appendChild(buildToolbar(session));
