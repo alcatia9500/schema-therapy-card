@@ -4,23 +4,59 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>スキーマ療法カード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700&display=swap">
 <style>
   :root {
-    --paper:        #f6f2ea;   /* ページ背景(温かい紙) */
-    --card:         #fffdf8;   /* カード面 */
-    --ink:          #3d3a34;   /* 主要テキスト(やわらかい茶墨) */
-    --ink-soft:     #6f6a60;   /* 副次テキスト */
-    --ink-faint:    #9a948a;   /* 補助テキスト */
-    --line:         #e6ded0;   /* 罫線・枠 */
-    --line-soft:    #efe9dd;
-    --accent:       #6f9a91;   /* セージ・ティール */
+    --paper:        #f5f1e7;   /* ページ背景(温かい紙) */
+    --card:         #fbf7ec;   /* カード面(両モードで紙のまま) */
+    --card-ink:     #3a362e;   /* カード上の文字(固定) */
+    --card-ink-soft:#6e675a;
+    --ink:          #3a362e;   /* UI主要テキスト */
+    --ink-soft:     #6e675a;
+    --ink-faint:    #9a9182;
+    --line:         #e2d9c6;
+    --line-soft:    #ece5d5;
+    --gold:         #a8845c;   /* 金茶(番号・飾り罫) */
+    --gold-soft:    #c3a87f;
+    --gold-tint:    rgba(168,132,92,.16);
+    --frame:        rgba(168,132,92,.4);   /* カード内枠 */
+    --accent:       #6f9a91;   /* セージ(操作系) */
     --accent-deep:  #557a72;
-    --accent-tint:  #6f9a911a;
+    --accent-tint:  rgba(111,154,145,.12);
+    --dom-disconnection: #b07a52;
+    --dom-autonomy:      #649189;
+    --dom-limits:        #8d7da2;
+    --dom-directedness:  #6e8fa9;
+    --dom-vigilance:     #879360;
+    --desk-a: #e8dfcb; --desk-b: #d8cbaf; --desk-c: #c2b090;
+    --ui-bg: rgba(251,248,241,.85);
+    --btn-face: #fffdf8; --btn-hover: #fbf8f1;
     --shadow-sm:    0 1px 2px rgba(61,58,52,.06), 0 2px 8px rgba(61,58,52,.05);
     --shadow-md:    0 4px 14px rgba(61,58,52,.10), 0 2px 6px rgba(61,58,52,.06);
     --shadow-lg:    0 18px 40px rgba(61,58,52,.22), 0 6px 14px rgba(61,58,52,.14);
-    --serif: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", serif;
+    --paper-tex: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.36 0 0 0 0 0.26 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23p)'/%3E%3C/svg%3E");
+    --wood-tex: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.14' numOctaves='4' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 0.30 0 0 0 0 0.22 0 0 0 0 0.12 0 0 0 0.18 0'/%3E%3C/filter%3E%3Crect width='420' height='420' filter='url(%23w)'/%3E%3C/svg%3E");
+    --serif: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", serif;
     --sans: system-ui, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #1f1c17; --card: #efe6d1;
+      --ink: #d9d1c0; --ink-soft: #a89e8c; --ink-faint: #7c7466;
+      --line: #3a352c; --line-soft: #2e2a23;
+      --gold: #b3906a; --gold-soft: #8a7350; --gold-tint: rgba(179,144,106,.18);
+      --accent: #7fa89f; --accent-deep: #93b8af; --accent-tint: rgba(127,168,159,.14);
+      --dom-disconnection: #bf8a60; --dom-autonomy: #74a198; --dom-limits: #9d8db3;
+      --dom-directedness: #7fa0bb; --dom-vigilance: #98a471;
+      --desk-a: #4a3c2e; --desk-b: #382d21; --desk-c: #261e15;
+      --ui-bg: rgba(30,27,21,.84);
+      --btn-face: #2b2721; --btn-hover: #353026;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.3), 0 2px 8px rgba(0,0,0,.25);
+      --shadow-md: 0 4px 14px rgba(0,0,0,.4), 0 2px 6px rgba(0,0,0,.3);
+      --shadow-lg: 0 18px 40px rgba(0,0,0,.55), 0 6px 14px rgba(0,0,0,.35);
+    }
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; }
@@ -41,22 +77,22 @@
   }
   button:hover { background: var(--accent-deep); }
   button:active { transform: translateY(1px); }
-  button.secondary { background: #fff; color: var(--ink); border-color: var(--line); box-shadow: none; }
-  button.secondary:hover { background: #fbf8f1; border-color: #ddd3c2; }
+  button.secondary { background: var(--btn-face); color: var(--ink); border-color: var(--line); box-shadow: none; }
+  button.secondary:hover { background: var(--btn-hover); border-color: var(--gold-soft); }
   button.ghost { background: transparent; color: var(--ink-soft); box-shadow: none; border-color: transparent; padding: 8px 12px; }
-  button.ghost:hover { background: #00000008; color: var(--ink); }
+  button.ghost:hover { background: var(--accent-tint); color: var(--ink); }
   button:disabled { opacity: .4; cursor: not-allowed; }
   button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   /* --- レイアウト --- */
   .wrap { max-width: 940px; margin: 0 auto; padding: 40px 20px 96px; }
   .page-head { margin-bottom: 28px; }
-  h1 { font-family: var(--serif); font-size: 1.7rem; font-weight: 600; letter-spacing: .04em; margin: 0 0 6px; }
-  .subtitle { color: var(--ink-soft); font-size: .92rem; margin: 0; }
-  .lead { color: var(--ink-soft); font-size: .92rem; margin: -2px 0 22px; }
+  h1 { font-family: var(--serif); font-size: 2rem; font-weight: 600; letter-spacing: .08em; margin: 0 0 6px; }
+  .subtitle { color: var(--ink-soft); font-size: .9rem; margin: 0; }
+  .lead { color: var(--ink-soft); font-size: .9rem; margin: -2px 0 22px; }
 
   .banner {
-    background: #f4e7d2; border: 1px solid #e2c99c; color: #6b5427;
+    background: var(--gold-tint); border: 1px solid var(--gold-soft); color: var(--ink);
     padding: 12px 16px; border-radius: 12px; margin-bottom: 20px; font-size: .88rem;
   }
 
@@ -68,7 +104,7 @@
     border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px;
     box-shadow: var(--shadow-sm); transition: transform .14s ease, box-shadow .18s ease, border-color .18s ease;
   }
-  .session-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: #ddd3c2; }
+  .session-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--gold-soft); }
   .session-item .meta { flex: 1; min-width: 0; }
   .session-title { font-weight: 600; font-size: 1.02rem; }
   .session-title[title] { cursor: text; border-radius: 4px; padding: 1px 3px; margin: -1px -3px; transition: background .15s; }
@@ -81,9 +117,9 @@
   .domain-section { margin-top: 26px; }
   .domain-head {
     display: flex; align-items: center; gap: 10px; font-family: var(--serif);
-    font-weight: 600; font-size: 1.05rem; letter-spacing: .03em; margin: 0 0 14px;
+    font-weight: 600; font-size: 1.12rem; letter-spacing: .06em; margin: 0 0 14px;
   }
-  .domain-dot { width: 12px; height: 12px; border-radius: 50%; flex: none; box-shadow: 0 0 0 3px #ffffff, 0 0 0 4px var(--line); }
+  .domain-dot { width: 12px; height: 12px; border-radius: 50%; flex: none; box-shadow: 0 0 0 3px var(--paper), 0 0 0 4px var(--line); }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(216px, 1fr)); gap: 14px; }
   .card-pick {
     position: relative; background: var(--card); border: 1.5px solid var(--line);
@@ -110,7 +146,7 @@
 
   .pick-bar {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
-    background: rgba(251,248,241,.86); backdrop-filter: blur(10px);
+    background: var(--ui-bg); backdrop-filter: blur(10px);
     border-top: 1px solid var(--line); box-shadow: 0 -6px 24px rgba(61,58,52,.07);
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
     padding: 14px 20px; padding-bottom: max(14px, env(safe-area-inset-bottom));
@@ -149,7 +185,7 @@
   .toolbar {
     position: fixed; top: 14px; left: 14px; right: 14px; z-index: 10;
     display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
-    background: rgba(251,248,241,.82); backdrop-filter: blur(12px);
+    background: var(--ui-bg); backdrop-filter: blur(12px);
     border: 1px solid var(--line); border-radius: 16px; padding: 9px 12px;
     box-shadow: var(--shadow-md);
   }
@@ -158,18 +194,18 @@
   .toolbar label { font-size: .78rem; color: var(--ink-soft); display: flex; align-items: center; gap: 8px; font-weight: 600; }
   .icon-btn {
     width: 34px; height: 34px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
-    font-size: 1.1rem; line-height: 1; background: #fff; color: var(--ink); border: 1px solid var(--line);
+    font-size: 1.1rem; line-height: 1; background: var(--btn-face); color: var(--ink); border: 1px solid var(--line);
     border-radius: 10px; box-shadow: none;
   }
-  .icon-btn:hover { background: #fbf8f1; }
+  .icon-btn:hover { background: var(--btn-hover); }
 
   /* レンジスライダー */
   input[type=range] { -webkit-appearance: none; appearance: none; width: 120px; height: 4px; border-radius: 999px;
     background: linear-gradient(var(--line), var(--line)); outline: none; }
   input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px;
-    border-radius: 50%; background: var(--accent); border: 2px solid #fff; box-shadow: var(--shadow-sm); cursor: pointer; }
+    border-radius: 50%; background: var(--accent); border: 2px solid var(--btn-face); box-shadow: var(--shadow-sm); cursor: pointer; }
   input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--accent);
-    border: 2px solid #fff; box-shadow: var(--shadow-sm); cursor: pointer; }
+    border: 2px solid var(--btn-face); box-shadow: var(--shadow-sm); cursor: pointer; }
 
   @media (max-width: 560px) {
     .wrap { padding: 28px 16px 96px; }
@@ -186,11 +222,11 @@
 
 // ==== デッキデータ ====
 const DOMAINS = [
-  { key: "disconnection", label: "I. 断絶と拒絶", color: "#c07a4b" },
-  { key: "autonomy",      label: "II. 自律性と行動の損傷", color: "#5f9a92" },
-  { key: "limits",        label: "III. 制約の欠如", color: "#9481a8" },
-  { key: "directedness",  label: "IV. 他者への追従", color: "#6f92b0" },
-  { key: "vigilance",     label: "V. 過剰警戒と抑制", color: "#8a9a5b" },
+  { key: "disconnection", label: "I. 断絶と拒絶" },
+  { key: "autonomy",      label: "II. 自律性と行動の損傷" },
+  { key: "limits",        label: "III. 制約の欠如" },
+  { key: "directedness",  label: "IV. 他者への追従" },
+  { key: "vigilance",     label: "V. 過剰警戒と抑制" },
 ];
 
 const SCHEMAS = [
@@ -435,12 +471,12 @@ function renderSelect(app) {
   for (const d of DOMAINS) {
     const section = el("div", { class:"domain-section" });
     section.appendChild(el("div", { class:"domain-head" },
-      el("span", { class:"domain-dot", style:`background:${d.color}` }),
+      el("span", { class:"domain-dot", style:`background:var(--dom-${d.key})` }),
       d.label
     ));
     const grid = el("div", { class:"grid" });
     for (const s of SCHEMAS.filter(x => x.domain === d.key)) {
-      const card = el("div", { class:"card-pick" + (chosen.has(s.id) ? " selected" : ""), style:`--dc:${d.color}` },
+      const card = el("div", { class:"card-pick" + (chosen.has(s.id) ? " selected" : ""), style:`--dc:var(--dom-${d.key})` },
         el("span", { class:"check" }, "✓"),
         el("div", { class:"cname" }, s.name),
         el("div", { class:"cdesc" }, s.desc)
@@ -523,7 +559,7 @@ function renderCanvas(app) {
     const s = schemaById(id);
     const d = domainById(s.domain);
     const p = session.placements[id];
-    const piece = el("div", { class:"card-piece", style:`--dc:${d.color}` },
+    const piece = el("div", { class:"card-piece", style:`--dc:var(--dom-${d.key})` },
       el("div", { class:"pdomain" }, d.label),
       el("div", { class:"pname" }, s.name),
       el("div", { class:"pdesc" }, s.desc)
