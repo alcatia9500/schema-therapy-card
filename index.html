@@ -225,6 +225,10 @@
     border-radius: 10px; box-shadow: none;
   }
   .icon-btn:hover { background: var(--btn-hover); }
+  #fs-btn[aria-pressed="true"] { background: var(--accent-tint); border-color: var(--gold-soft); color: var(--ink); }
+  /* 全画面時の背景フォールバック(canvas-viewが全面を覆うため通常は見えないが念のため) */
+  #app:fullscreen { background: var(--paper); }
+  #app:-webkit-full-screen { background: var(--paper); }
 
   /* レンジスライダー */
   input[type=range] { -webkit-appearance: none; appearance: none; width: 120px; height: 4px; border-radius: 999px;
@@ -676,6 +680,7 @@ function renderCanvas(app) {
 
   app.appendChild(viewportEl);
   app.appendChild(buildToolbar(session));
+  syncFullscreenBtn(); // 全画面中に机上へ戻った場合のボタン文言同期
   applyStageTransform();
   attachViewControls(session);
 }
@@ -699,12 +704,18 @@ function buildToolbar(session) {
   const reselect = el("button", { class:"secondary", onclick: () => go("select") }, "カードを選び直す");
   const home = el("button", { class:"ghost", onclick: () => go("home") }, "← ホーム");
 
+  // 非対応環境(iPhone Safari等)ではボタン自体を出さない
+  const fsBtn = fsSupported()
+    ? el("button", { id:"fs-btn", class:"secondary", "aria-pressed":"false",
+        title:"全画面表示 (F)", onclick: () => toggleFullscreen() }, "⛶ 全画面")
+    : null;
+
   return el("div", { class:"toolbar" },
     home, reselect,
     el("span", { class:"spacer" }),
     el("label", null, el("span", { class:"tlabel" }, "ズーム"), el("span", { class:"group" }, zoomOut, zoomIn)),
     el("label", null, el("span", { class:"tlabel" }, "傾き"), tilt),
-    reset
+    reset, fsBtn
   );
 }
 
@@ -712,6 +723,48 @@ function nudgeZoom(session, delta) {
   session.view.zoom = clamp(session.view.zoom + delta, ZOOM_MIN, ZOOM_MAX);
   applyStageTransform(); touchSession(session); scheduleSave();
 }
+
+// ==== 全画面表示(机上) ====
+// ベンダー接頭辞を吸収(デスクトップSafari対応)。iPhone Safari等の非対応環境では
+// fsSupported() が false になり、ツールバーに全画面ボタンを出さない。
+function fsSupported() { return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled); }
+function fsElement()   { return document.fullscreenElement || document.webkitFullscreenElement || null; }
+function fsRequest(elm) {
+  const fn = elm.requestFullscreen || elm.webkitRequestFullscreen;
+  if (!fn) return;
+  try { const r = fn.call(elm); if (r && r.catch) r.catch(() => {}); } catch (_) {}
+}
+function fsExit() {
+  const fn = document.exitFullscreen || document.webkitExitFullscreen;
+  if (!fn) return;
+  try { const r = fn.call(document); if (r && r.catch) r.catch(() => {}); } catch (_) {}
+}
+function toggleFullscreen() {
+  if (!fsSupported()) return;
+  if (fsElement()) fsExit();
+  else fsRequest(document.getElementById("app"));
+}
+// ツールバーは画面遷移で再生成されるため、DOM上のボタンを都度探して状態同期する
+function syncFullscreenBtn() {
+  const btn = document.getElementById("fs-btn");
+  if (!btn) return;
+  const on = !!fsElement();
+  btn.textContent = on ? "⛶ 解除" : "⛶ 全画面";
+  btn.setAttribute("aria-pressed", on ? "true" : "false");
+  btn.title = on ? "全画面を解除 (Esc / F)" : "全画面表示 (F)";
+}
+document.addEventListener("fullscreenchange", syncFullscreenBtn);
+document.addEventListener("webkitfullscreenchange", syncFullscreenBtn);
+// F キーで机上のみトグル。入力欄フォーカス中や修飾キー併用時は無効。
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "f" && e.key !== "F") return;
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (state.screen !== "canvas") return;
+  const t = e.target;
+  if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+  e.preventDefault();
+  toggleFullscreen();
+});
 
 // ==== ドラッグ移動と視点操作 ====
 function screenDeltaToStage(dx, dy, view) {
