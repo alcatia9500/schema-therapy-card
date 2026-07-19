@@ -646,8 +646,9 @@ function toast(msg) {
 }
 
 // ==== ライブ提出(WebRTC / PeerJS)====
-// 依存を増やさないため、ライブを使う瞬間にだけ PeerJS を遅延読込する。
-const PEERJS_SRC = "https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js";
+// PeerJS はリポジトリに同梱(同一オリジン)。外部CDN依存・供給網リスクを避けるため、
+// ライブを使う瞬間にだけこのローカルスクリプトを遅延読込する。
+const PEERJS_SRC = "peerjs-1.5.4.min.js";
 const LIVE_PREFIX = "stcard-live-";
 let _peerLoading = null;
 function loadPeerJS() {
@@ -662,7 +663,7 @@ function loadPeerJS() {
       document.head.appendChild(sc);
       setTimeout(() => resolve((typeof window !== "undefined" && window.Peer) || null), 10000); // 保険
     } catch (e) { resolve(null); }
-  });
+  }).then((P) => { if (!P) _peerLoading = null; return P; });   // 失敗はキャッシュせず次回再試行
   return _peerLoading;
 }
 
@@ -778,8 +779,10 @@ function el(tag, attrs, ...children) {
 
 const _schemaMap = Object.fromEntries(SCHEMAS.map(s => [s.id, s]));
 const _domainMap = Object.fromEntries(DOMAINS.map(d => [d.key, d]));
-function schemaById(id){ return _schemaMap[id]; }
-function domainById(key){ return _domainMap[key]; }
+const _has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+// hasOwnProperty ガード: 細工された id("__proto__" 等)で Object.prototype を掴まないように
+function schemaById(id){ return _has(_schemaMap, id) ? _schemaMap[id] : undefined; }
+function domainById(key){ return _has(_domainMap, key) ? _domainMap[key] : undefined; }
 
 // ==== カード面(共通意匠) ====
 const ROMAN = ["Ⅰ","Ⅱ","Ⅲ","Ⅳ","Ⅴ","Ⅵ","Ⅶ","Ⅷ","Ⅸ","Ⅹ","Ⅺ","Ⅻ","ⅩⅢ","ⅩⅣ","ⅩⅤ","ⅩⅥ","ⅩⅦ","ⅩⅧ"];
@@ -811,6 +814,7 @@ function cardFace(s) {
 }
 
 function clamp(n, lo, hi){ return Math.max(lo, Math.min(hi, n)); }
+function num(v, fallback){ const n = Number(v); return Number.isFinite(n) ? n : fallback; }
 
 function go(screen) {
   state.screen = screen;
@@ -1116,11 +1120,25 @@ function sessionBoard(session) {
   };
 }
 function submissionBoard(payload) {
+  // 提出データ(=信頼できない入力)を健全化: 自プロパティのみ・数値のみ・視点はクランプ
+  const srcP = payload.placements || {};
+  const placements = {};
+  for (const k in srcP) {
+    if (!_has(srcP, k)) continue;
+    const p = srcP[k] || {};
+    placements[k] = { x: num(p.x, 0), y: num(p.y, 0), z: num(p.z, 0) };
+  }
+  const v = payload.view || {};
   return {
     session: null,
     selectedCardIds: Array.isArray(payload.selectedCardIds) ? payload.selectedCardIds : [],
-    placements: payload.placements || {},
-    view: Object.assign({ zoom:1, tilt:0, panX:0, panY:0 }, payload.view || {}),  // ローカルな複製(保存しない)
+    placements,
+    view: {   // ローカルな複製(保存しない)
+      zoom: clamp(num(v.zoom, 1), ZOOM_MIN, ZOOM_MAX),
+      tilt: clamp(num(v.tilt, 0), TILT_MIN, TILT_MAX),
+      panX: num(v.panX, 0),
+      panY: num(v.panY, 0),
+    },
     readonly: true,
     persist() { /* 閲覧専用: 何もしない */ },
   };
@@ -1154,9 +1172,10 @@ function buildBoardView(board) {
   board.selectedCardIds.forEach((id, i) => {
     const s = schemaById(id);
     if (!s) return;                         // 未知IDは無視(壊れた提出への保険)
+    const d = domainById(s.domain);
+    if (!d) return;                         // ドメイン不明も無視
     const p = board.placements[id];
     if (!p) return;
-    const d = domainById(s.domain);
     const piece = el("div", { class:"card-piece" + (board.readonly ? " readonly" : ""),
       style:`--dc:var(--dom-${d.key});--i:${i}` }, cardFace(s));
     piece.dataset.id = id;
@@ -1384,9 +1403,10 @@ function openSubmitDialog(session) {
   const backdrop = el("div", { class:"modal-backdrop" });
   const modal = el("div", { class:"modal" });
   backdrop.appendChild(modal);
-  const close = () => backdrop.remove();
+  const escHandler = (e) => { if (e.key === "Escape") close(); };
+  const close = () => { backdrop.remove(); document.removeEventListener("keydown", escHandler); };
   backdrop.addEventListener("pointerdown", (e) => { if (e.target === backdrop) close(); });
-  document.addEventListener("keydown", function esc(e){ if (e.key === "Escape"){ close(); document.removeEventListener("keydown", esc); } });
+  document.addEventListener("keydown", escHandler);
 
   let prevName = "";
   try { prevName = sessionStorage.getItem("stc.lastName") || ""; } catch (_) {}
