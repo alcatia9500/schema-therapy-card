@@ -88,7 +88,7 @@
   button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   /* --- レイアウト --- */
-  .wrap { max-width: 940px; margin: 0 auto; padding: 40px 20px 96px; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 40px 20px 96px; }
   .page-head { margin-bottom: 28px; }
   h1 { font-family: var(--serif); font-size: 2rem; font-weight: 600; letter-spacing: .08em; margin: 0 0 6px; }
   .subtitle { color: var(--ink-soft); font-size: .9rem; margin: 0; }
@@ -122,7 +122,7 @@
     display: flex; align-items: center; gap: 10px; font-family: var(--serif);
     font-weight: 600; font-size: 1.12rem; letter-spacing: .06em; margin: 0 0 14px;
   }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 16px; }
   .card-pick {
     position: relative; padding: 18px 14px 13px;
     background: var(--card); background-image: var(--paper-tex);
@@ -137,27 +137,28 @@
   .card-pick:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
   .card-pick.selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-tint), var(--shadow-md); }
 
-  /* カード面(選択・机 共通) */
-  .card-face { display: flex; flex-direction: column; height: 100%; text-align: center; color: var(--card-ink); position: relative; }
-  .cf-head { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-bottom: 6px; }
+  /* カード面(選択・机 共通、横長: 左=イラスト / 右=説明) */
+  .card-face { display: flex; flex-direction: row; align-items: stretch; gap: 12px; height: 100%; text-align: left; color: var(--card-ink); position: relative; }
+  .cf-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .cf-head { display: flex; flex-direction: row; align-items: center; gap: 6px; margin-bottom: 2px; }
   .cf-sigil { display: inline-flex; }
   .cf-sigil svg { width: 20px; height: 20px; color: var(--dc, var(--gold)); display: block; }
   .cf-num { font-family: var(--serif); color: var(--gold); font-size: .78rem; letter-spacing: .14em; }
   /* イラスト+重ね文字(画像は常に明色の紙調なので文字色は固定) */
-  .cf-art { position: relative; margin-top: 6px; border-radius: 6px; overflow: hidden; flex: none;
+  .cf-art { position: relative; width: 45%; align-self: center; border-radius: 6px; overflow: hidden; flex: none;
     border: 1px solid rgba(120,100,70,.16); }
   .cf-art img { display: block; width: 100%; aspect-ratio: 832 / 512; object-fit: cover;
     user-select: none; -webkit-user-drag: none; pointer-events: none; }
   .cf-word { position: absolute; font-family: var(--serif); font-weight: 600; color: #3a362e;
-    font-size: .92rem; letter-spacing: .08em; line-height: 1.35; text-align: left; white-space: nowrap;
+    font-size: .8rem; letter-spacing: .08em; line-height: 1.35; text-align: left; white-space: nowrap;
     text-shadow: 0 0 8px rgba(248,244,234,.95), 0 0 3px rgba(248,244,234,.9); }
   .cf-word .wmain { display: block; font-size: 1em; }
   .cf-word .wsub { display: block; font-size: .64em; color: #6e675a; letter-spacing: .14em; margin-top: 1px; }
-  .card-piece .cf-word { font-size: .76rem; }
-  .cf-sep { width: 34px; height: 1px; background: var(--gold-soft); margin: 8px auto; position: relative; flex: none; }
+  .card-piece .cf-word { font-size: .6rem; }
+  .cf-sep { width: 34px; height: 1px; background: var(--gold-soft); margin: 7px 0; position: relative; flex: none; }
   .cf-sep::after { content: ""; position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; background: var(--gold-soft); transform: translate(-50%,-50%) rotate(45deg); }
   .cf-desc { font-size: .74rem; color: var(--card-ink-soft); line-height: 1.6; flex: 1; }
-  .cf-domain { font-size: .62rem; letter-spacing: .1em; color: var(--dc, var(--gold)); margin-top: 8px; opacity: .85; }
+  .cf-domain { font-size: .62rem; letter-spacing: .1em; color: var(--dc, var(--gold)); margin-top: auto; padding-top: 6px; opacity: .85; }
   .card-pick .check {
     position: absolute; top: 12px; right: 12px; width: 22px; height: 22px; border-radius: 50%;
     background: var(--accent); color: #fff; font-size: .74rem; font-weight: 700;
@@ -190,9 +191,9 @@
   }
   .stage { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; }
   .card-piece {
-    position: absolute; width: 150px; min-height: 256px; margin-left: -75px; margin-top: -128px;
+    position: absolute; width: 252px; min-height: 150px; margin-left: -126px; margin-top: -75px;
     background: var(--card); background-image: var(--paper-tex);
-    border: 1px solid rgba(93,79,58,.3); border-radius: 10px; padding: 16px 13px 11px;
+    border: 1px solid rgba(93,79,58,.3); border-radius: 10px; padding: 13px 13px 10px;
     box-shadow:
       0 calc(2px + 16px * var(--tiltf, 0)) calc(10px + 22px * var(--tiltf, 0)) rgba(35,26,12,.35),
       0 2px 4px rgba(35,26,12,.18);
@@ -203,8 +204,7 @@
     content: ""; position: absolute; inset: 5px; border: 1px solid var(--frame);
     border-radius: 6px; pointer-events: none;
   }
-  .card-piece .cf-name { font-size: .88rem; }
-  .card-piece .cf-desc { font-size: .68rem; }
+  .card-piece .cf-desc { font-size: .63rem; }
   .card-piece:hover { box-shadow: 0 calc(6px + 16px * var(--tiltf, 0)) calc(16px + 22px * var(--tiltf, 0)) rgba(35,26,12,.4), 0 3px 6px rgba(35,26,12,.2); }
   .card-piece.dragging { cursor: grabbing; transform: scale(1.05) rotate(.8deg);
     box-shadow: 0 calc(10px + 18px * var(--tiltf, 0)) calc(24px + 24px * var(--tiltf, 0)) rgba(35,26,12,.45), 0 4px 8px rgba(35,26,12,.22); }
@@ -309,7 +309,7 @@ const SCHEMAS = [
     art:{ pos:"left:50%;top:9%;transform:translateX(-50%);text-align:center", main:"権利要求", sub:"尊大" } },
   { id:"insufficient-self-control", name:"自制と自律の欠如", domain:"limits",
     desc:"退屈や不快に耐えるのが難しく、衝動や感情を抑えて目標を追うのが苦手。",
-    art:{ pos:"right:6%;top:10%;text-align:right;font-size:.75rem", main:"自制と自律の欠如" } },
+    art:{ pos:"right:6%;top:10%;text-align:right;font-size:.78em", main:"自制と自律の欠如" } },
   { id:"subjugation", name:"服従", domain:"directedness",
     desc:"衝突や見捨てを避けるため、自分の欲求や感情を抑えて他者に従ってしまう。",
     art:{ pos:"left:6%;top:38%", main:"服従" } },
@@ -318,7 +318,7 @@ const SCHEMAS = [
     art:{ pos:"right:7%;top:10%;text-align:right", main:"自己犠牲" } },
   { id:"approval-seeking", name:"評価と承認の希求", domain:"directedness",
     desc:"他者からの評価・承認を過度に求め、それに合わせて自分を形づくってしまう。",
-    art:{ pos:"left:5%;top:8%;font-size:.7rem", main:"評価と承認の希求" } },
+    art:{ pos:"left:5%;top:8%;font-size:.78em", main:"評価と承認の希求" } },
   { id:"negativity", name:"否定／悲観", domain:"vigilance",
     desc:"物事の悪い面ばかりに目が向き、うまくいかない未来を強く予期してしまう。",
     art:{ pos:"left:6%;top:10%", main:"否定／悲観" } },
@@ -443,13 +443,14 @@ function cardFace(s) {
     el("span", { class: "wmain" }, s.art.main));
   if (s.art.sub) word.appendChild(el("span", { class: "wsub" }, s.art.sub));
   return el("div", { class: "card-face" },
-    el("div", { class: "cf-head" }, sigil, el("span", { class: "cf-num" }, ROMAN[_schemaIndex[s.id]])),
     el("div", { class: "cf-art" },
       el("img", { src: `img/${s.id}.jpg`, alt: s.name, draggable: "false" }),
       word),
-    el("span", { class: "cf-sep" }),
-    el("div", { class: "cf-desc" }, s.desc),
-    el("div", { class: "cf-domain" }, d.label)
+    el("div", { class: "cf-body" },
+      el("div", { class: "cf-head" }, sigil, el("span", { class: "cf-num" }, ROMAN[_schemaIndex[s.id]])),
+      el("span", { class: "cf-sep" }),
+      el("div", { class: "cf-desc" }, s.desc),
+      el("div", { class: "cf-domain" }, d.label))
   );
 }
 
@@ -621,7 +622,7 @@ function reconcilePlacements(session) {
   const newIds = selected.filter(id => !kept[id]);
   const cols = Math.ceil(Math.sqrt(newIds.length)) || 1;
   const rows = Math.ceil(newIds.length / cols) || 1;
-  const gapX = 182, gapY = 300;
+  const gapX = 280, gapY = 185;
   newIds.forEach((id, i) => {
     const r = Math.floor(i / cols), c = i % cols;
     const x = (c - (cols - 1) / 2) * gapX;
