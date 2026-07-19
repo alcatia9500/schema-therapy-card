@@ -461,6 +461,8 @@ function cardFace(s) {
 function clamp(n, lo, hi){ return Math.max(lo, Math.min(hi, n)); }
 
 function go(screen) {
+  // 机上を離れる際は全画面を自動解除(遷移先に解除UIが無く Esc 頼みになるのを防ぐ)
+  if (screen !== "canvas" && fsElement()) fsExit();
   state.screen = screen;
   render();
 }
@@ -758,7 +760,7 @@ document.addEventListener("webkitfullscreenchange", syncFullscreenBtn);
 // F キーで机上のみトグル。入力欄フォーカス中や修飾キー併用時は無効。
 document.addEventListener("keydown", (e) => {
   if (e.key !== "f" && e.key !== "F") return;
-  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
   if (state.screen !== "canvas") return;
   const t = e.target;
   if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
