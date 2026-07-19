@@ -9,56 +9,68 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700&display=swap">
 <style>
   :root {
-    --paper:        #f5f1e7;   /* ページ背景(温かい紙) */
-    --card:         #fbf7ec;   /* カード面(両モードで紙のまま) */
-    --card-ink:     #3a362e;   /* カード上の文字(固定) */
+    /* ===== 案A(クリニカル・エディトリアル)ライトトークン ===== */
+    --paper:        #f7f4ec;   /* ページ背景 */
+    --card:         #fdfbf4;   /* カード面(両モードで象牙紙のまま) */
+    --card-ink:     #3a362e;   /* カード上の文字(固定・画像が明色のため) */
     --card-ink-soft:#6e675a;
-    --ink:          #3a362e;   /* UI主要テキスト */
-    --ink-soft:     #6e675a;
-    --ink-faint:    #9a9182;
-    --line:         #e2d9c6;
-    --line-soft:    #ece5d5;
-    --gold:         #a8845c;   /* 金茶(番号・飾り罫) */
-    --gold-soft:    #c3a87f;
-    --gold-tint:    rgba(168,132,92,.16);
-    --frame:        rgba(168,132,92,.4);   /* カード内枠 */
-    --accent:       #6f9a91;   /* セージ(操作系) */
-    --accent-deep:  #557a72;
-    --accent-tint:  rgba(111,154,145,.12);
-    --dom-disconnection: #b07a52;
-    --dom-autonomy:      #649189;
-    --dom-limits:        #8d7da2;
-    --dom-directedness:  #6e8fa9;
-    --dom-vigilance:     #879360;
-    --desk-a: #e8dfcb; --desk-b: #d8cbaf; --desk-c: #c2b090;
-    --ui-bg: rgba(251,248,241,.85);
-    --surface: #fffdf8;
-    --btn-face: #fffdf8; --btn-hover: #fbf8f1;
-    --shadow-sm:    0 1px 2px rgba(61,58,52,.06), 0 2px 8px rgba(61,58,52,.05);
-    --shadow-md:    0 4px 14px rgba(61,58,52,.10), 0 2px 6px rgba(61,58,52,.06);
-    --shadow-lg:    0 18px 40px rgba(61,58,52,.22), 0 6px 14px rgba(61,58,52,.14);
-    --paper-tex: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.36 0 0 0 0 0.26 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23p)'/%3E%3C/svg%3E");
-    --wood-tex: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.14' numOctaves='4' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 0.30 0 0 0 0 0.22 0 0 0 0 0.12 0 0 0 0.18 0'/%3E%3C/filter%3E%3Crect width='420' height='420' filter='url(%23w)'/%3E%3C/svg%3E");
+    --ink:          #232b33;   /* UI主要テキスト(墨紺) */
+    --ink-soft:     #5c6570;
+    --ink-faint:    #939aa3;
+    /* 罫線: hairline=細罫 / hairline-strong=見出しの二重罫など */
+    --hairline:        #d8d2c2;
+    --hairline-strong: #b9b09a;
+    --line:         #d8d2c2;   /* 既存名エイリアス(=hairline) */
+    --line-soft:    #e6dfce;
+    /* 真鍮(番号・飾り罫)。既存の --gold 系は brass のエイリアスとして温存 */
+    --brass:        #8d6f43;
+    --brass-soft:   #b49a6e;
+    --gold:         #8d6f43;
+    --gold-soft:    #b49a6e;
+    --gold-tint:    rgba(141,111,67,.13);
+    --frame:        rgba(141,111,67,.35);   /* カード内側の真鍮フレーム */
+    --accent:       #2f6b5f;   /* 深いティール(操作系) */
+    --accent-deep:  #24544b;
+    --accent-tint:  rgba(47,107,95,.08);
+    --dom-disconnection: #a06a44;
+    --dom-autonomy:      #557f77;
+    --dom-limits:        #7d6d94;
+    --dom-directedness:  #5d7f9b;
+    --dom-vigilance:     #77844e;
+    /* 机: 案Aの深い胡桃材 */
+    --desk-a: #4c3a27; --desk-b: #38291a; --desk-c: #241a10;
+    --ui-bg: rgba(247,244,236,.9);
+    --surface: #fdfbf4;
+    --btn-face: #fdfbf4; --btn-hover: #f1ece0;
+    --shadow-sm:    0 1px 2px rgba(20,24,28,.05), 0 3px 10px rgba(20,24,28,.05);
+    --shadow-md:    0 2px 4px rgba(20,24,28,.06), 0 10px 26px rgba(20,24,28,.10);
+    --shadow-lg:    0 6px 16px rgba(20,24,28,.14), 0 22px 56px rgba(20,24,28,.20);
+    --paper-tex: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.36 0 0 0 0 0.26 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23p)'/%3E%3C/svg%3E");
+    --wood-tex: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.14' numOctaves='4' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 0.28 0 0 0 0 0.20 0 0 0 0 0.10 0 0 0 0.22 0'/%3E%3C/filter%3E%3Crect width='420' height='420' filter='url(%23w)'/%3E%3C/svg%3E");
     --serif: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", serif;
     --sans: system-ui, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --paper: #1f1c17; --card: #efe6d1;
-      --ink: #d9d1c0; --ink-soft: #a89e8c; --ink-faint: #7c7466;
-      --line: #3a352c; --line-soft: #2e2a23;
-      --gold: #b3906a; --gold-soft: #8a7350; --gold-tint: rgba(179,144,106,.18);
-      --accent: #7fa89f; --accent-tint: rgba(127,168,159,.14);
-      --dom-disconnection: #bf8a60; --dom-autonomy: #74a198; --dom-limits: #9d8db3;
-      --dom-directedness: #7fa0bb; --dom-vigilance: #98a471;
-      --desk-a: #4a3c2e; --desk-b: #382d21; --desk-c: #261e15;
-      --ui-bg: rgba(30,27,21,.84);
-      --surface: #29251f;
-      --btn-face: #2b2721; --btn-hover: #353026;
-      --accent-deep: #52756d;
-      --shadow-sm: 0 1px 2px rgba(0,0,0,.3), 0 2px 8px rgba(0,0,0,.25);
-      --shadow-md: 0 4px 14px rgba(0,0,0,.4), 0 2px 6px rgba(0,0,0,.3);
-      --shadow-lg: 0 18px 40px rgba(0,0,0,.55), 0 6px 14px rgba(0,0,0,.35);
+      /* ===== 案A調ダークパレット: 紙を墨紺へ沈め、象牙カードは維持、真鍮/ティールは彩度調整 ===== */
+      --paper: #171b1f; --card: #efe6d1;
+      --card-ink: #2b2721; --card-ink-soft: #5c554a;
+      --ink: #dfe3e6; --ink-soft: #a3aab0; --ink-faint: #727981;
+      --hairline: #363e46; --hairline-strong: #525c66;
+      --line: #363e46; --line-soft: #262c32;
+      --brass: #c2a877; --brass-soft: #9a835c;
+      --gold: #c2a877; --gold-soft: #9a835c; --gold-tint: rgba(194,168,119,.15);
+      --frame: rgba(194,168,119,.38);
+      --accent: #5fa093; --accent-deep: #4b8578; --accent-tint: rgba(95,160,147,.15);
+      --dom-disconnection: #c08a5f; --dom-autonomy: #6fa196; --dom-limits: #9b8bb3;
+      --dom-directedness: #7ba0bd; --dom-vigilance: #97a56a;
+      --desk-a: #3a2c1e; --desk-b: #281d12; --desk-c: #150e07;
+      --ui-bg: rgba(23,27,31,.86);
+      --surface: #21262b;
+      --btn-face: #242a2f; --btn-hover: #2e353b;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.3), 0 3px 10px rgba(0,0,0,.28);
+      --shadow-md: 0 2px 4px rgba(0,0,0,.35), 0 10px 26px rgba(0,0,0,.4);
+      --shadow-lg: 0 6px 16px rgba(0,0,0,.4), 0 22px 56px rgba(0,0,0,.55);
     }
   }
   * { box-sizing: border-box; }
@@ -71,83 +83,115 @@
   }
   #app { min-height: 100vh; }
 
-  /* --- ボタン --- */
+  /* --- ボタン(案A: 角ばった矩形・字間広め・ティール地) --- */
   button {
-    font: inherit; cursor: pointer; border: 1px solid transparent; border-radius: 999px;
-    padding: 10px 20px; background: var(--accent); color: #fff; font-weight: 600;
-    letter-spacing: .02em; box-shadow: var(--shadow-sm);
-    transition: background .18s ease, transform .12s ease, box-shadow .18s ease, opacity .18s ease;
+    font: inherit; cursor: pointer; border: 1px solid var(--accent-deep); border-radius: 4px;
+    padding: 11px 26px; background: var(--accent); color: #fff; font-weight: 600;
+    letter-spacing: .14em; text-indent: .14em;
+    box-shadow: 0 1px 0 rgba(20,24,28,.15), inset 0 1px 0 rgba(255,255,255,.14);
+    transition: background .18s ease, transform .12s ease, box-shadow .18s ease, opacity .18s ease, border-color .18s ease;
   }
   button:hover { background: var(--accent-deep); }
   button:active { transform: translateY(1px); }
-  button.secondary { background: var(--btn-face); color: var(--ink); border-color: var(--line); box-shadow: none; }
-  button.secondary:hover { background: var(--btn-hover); border-color: var(--gold-soft); }
-  button.ghost { background: transparent; color: var(--ink-soft); box-shadow: none; border-color: transparent; padding: 8px 12px; }
+  button.secondary { background: transparent; color: var(--accent-deep); border-color: var(--accent);
+    box-shadow: none; font-weight: 600; }
+  button.secondary:hover { background: var(--accent-tint); }
+  button.ghost { background: transparent; color: var(--ink-soft); box-shadow: none; border-color: transparent;
+    padding: 9px 14px; letter-spacing: .1em; text-indent: .1em; }
   button.ghost:hover { background: var(--accent-tint); color: var(--ink); }
-  button:disabled { opacity: .4; cursor: not-allowed; }
+  button:disabled { opacity: .38; cursor: not-allowed; }
   button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   /* --- レイアウト --- */
-  .wrap { max-width: 1160px; margin: 0 auto; padding: 40px 20px 96px; }
-  .page-head { margin-bottom: 28px; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 34px 26px 96px; }
   h1 { font-family: var(--serif); font-size: 2rem; font-weight: 600; letter-spacing: .08em; margin: 0 0 6px; }
-  .subtitle { color: var(--ink-soft); font-size: .9rem; margin: 0; }
-  .lead { color: var(--ink-soft); font-size: .9rem; margin: -2px 0 22px; }
+
+  /* --- マストヘッド(題字) --- */
+  .masthead { text-align: center; padding: 34px 20px 0; }
+  .mh-over { font-size: .66rem; letter-spacing: .42em; text-indent: .42em; color: var(--brass); margin: 0 0 10px; }
+  .mh-title { font-family: var(--serif); font-weight: 600; font-size: 2.1rem; letter-spacing: .3em; text-indent: .3em; margin: 0; }
+  .mh-sub { font-size: .72rem; letter-spacing: .3em; text-indent: .3em; color: var(--ink-soft); margin: 8px 0 0; }
+  .mh-rule { width: min(620px, 82%); margin: 18px auto 0; border-top: 1px solid var(--hairline-strong); position: relative; }
+  .mh-rule::after { content: ""; display: block; border-top: 1px solid var(--hairline-strong); margin-top: 3px; }
+  .mh-index { display: flex; justify-content: center; gap: 14px; margin: 16px 0 0; font-family: var(--serif);
+    font-size: .72rem; color: var(--ink-faint); letter-spacing: .1em; flex-wrap: wrap; padding: 0 16px; }
+  .lede { text-align: center; color: var(--ink-soft); font-size: .9rem; margin: 0 0 30px; }
+
+  /* --- セクション見出し(明朝 + 罫) --- */
+  .sec-head { display: flex; align-items: baseline; gap: 14px; margin: 30px 0 16px; }
+  .sec-head h2 { font-family: var(--serif); font-size: 1.02rem; font-weight: 600; letter-spacing: .18em; margin: 0; }
+  .sec-head .no { font-family: var(--serif); color: var(--brass); font-size: .8rem; letter-spacing: .1em; }
+  .sec-head::after { content: ""; flex: 1; border-top: 1px solid var(--hairline); transform: translateY(-4px); }
+
+  /* --- 奥付(信頼の根拠をデザインとして置く) --- */
+  .colophon { margin-top: 52px; padding-top: 14px; border-top: 1px solid var(--hairline-strong); text-align: center; }
+  .colophon::before { content: "\2767"; display: block; color: var(--brass-soft); font-size: .9rem; margin-bottom: 8px; }
+  .colophon p { margin: 2px 0; font-size: .7rem; color: var(--ink-faint); letter-spacing: .08em; }
+  .colophon .pr { font-family: var(--serif); color: var(--ink-soft); }
 
   .banner {
-    background: var(--gold-tint); border: 1px solid var(--gold-soft); color: var(--ink);
-    padding: 12px 16px; border-radius: 12px; margin-bottom: 20px; font-size: .88rem;
+    background: var(--gold-tint); border: 1px solid var(--brass-soft); color: var(--ink);
+    padding: 12px 16px; border-radius: 4px; margin: 14px 26px 0; font-size: .88rem;
   }
 
-  /* --- ホーム / セッション一覧 --- */
+  /* --- ホーム / セッション一覧(罫線の目録スタイル) --- */
   .new-btn { display: inline-flex; align-items: center; gap: 8px; }
-  .session-list { margin-top: 26px; display: flex; flex-direction: column; gap: 12px; }
+  .cta-row { display: flex; justify-content: center; margin: 4px 0 8px; }
+  .session-list { margin-top: 4px; display: flex; flex-direction: column;
+    border-top: 1px solid var(--hairline-strong); }
   .session-item {
-    display: flex; align-items: center; gap: 14px; background: var(--surface);
-    border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px;
-    box-shadow: var(--shadow-sm); transition: transform .14s ease, box-shadow .18s ease, border-color .18s ease;
+    display: flex; align-items: center; gap: 16px; background: transparent;
+    border: none; border-bottom: 1px solid var(--hairline); border-radius: 0; padding: 15px 6px;
+    box-shadow: none; transition: background .16s ease;
   }
-  .session-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--gold-soft); }
+  .session-item:hover { transform: none; box-shadow: none; background: var(--accent-tint); }
   .session-item .meta { flex: 1; min-width: 0; }
-  .session-title { font-weight: 600; font-size: 1.02rem; }
-  .session-title[title] { cursor: text; border-radius: 4px; padding: 1px 3px; margin: -1px -3px; transition: background .15s; }
+  .session-title { font-weight: 600; font-size: .98rem; }
+  .session-title[title] { cursor: text; border-radius: 3px; padding: 1px 3px; margin: -1px -3px; transition: background .15s; }
   .session-title[title]:hover { background: var(--accent-tint); }
-  .session-item .meta small { display: block; color: var(--ink-faint); font-size: .8rem; margin-top: 3px; }
+  .session-item .meta small { display: block; color: var(--ink-faint); font-size: .78rem; margin-top: 3px; letter-spacing: .03em; }
   .empty { color: var(--ink-soft); padding: 40px 0; text-align: center; }
   .empty .emoji { font-size: 2rem; display: block; margin-bottom: 10px; opacity: .7; }
 
   /* --- カード選択 --- */
-  .domain-section { margin-top: 26px; }
+  .domain-section { margin-top: 34px; }
   .domain-head {
-    display: flex; align-items: center; gap: 10px; font-family: var(--serif);
-    font-weight: 600; font-size: 1.12rem; letter-spacing: .06em; margin: 0 0 14px;
+    display: flex; align-items: center; gap: 12px; margin: 0 0 14px;
   }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 16px; }
+  .domain-head .dnum { font-family: var(--serif); font-size: 1.24rem; color: var(--dc, var(--brass)); letter-spacing: .06em; }
+  .domain-head h3 { font-family: var(--serif); font-size: 1.06rem; font-weight: 600; letter-spacing: .14em; margin: 0; }
+  .domain-head .den { font-size: .62rem; letter-spacing: .22em; color: var(--ink-faint); align-self: flex-end; margin-bottom: 3px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 18px; }
   .card-pick {
-    position: relative; padding: 18px 14px 13px;
+    position: relative; padding: 16px 15px 12px;
     background: var(--card); background-image: var(--paper-tex);
-    border: 1px solid rgba(120,100,70,.28); border-radius: 12px;
+    border: 1px solid var(--hairline-strong); border-radius: 3px;
     box-shadow: var(--shadow-sm); cursor: pointer;
     transition: transform .14s ease, box-shadow .18s ease, border-color .18s ease;
   }
   .card-pick::before {
-    content: ""; position: absolute; inset: 6px; border: 1px solid var(--frame);
-    border-radius: 8px; pointer-events: none;
+    content: ""; position: absolute; inset: 5px; border: 1px solid var(--frame);
+    border-radius: 0; pointer-events: none;
   }
-  .card-pick:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
-  .card-pick.selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-tint), var(--shadow-md); }
+  .card-pick::after {
+    content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px;
+    background: var(--dc, var(--brass)); opacity: .8; pointer-events: none;
+  }
+  .card-pick:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .card-pick.selected { border-color: var(--accent-deep); box-shadow: 0 0 0 1px var(--accent-deep), var(--shadow-md); }
+  .card-pick .cf-head { margin-right: 26px; }
 
   /* カード面(選択・机 共通、横長: 左=イラスト / 右=説明) */
-  .card-face { display: flex; flex-direction: row; align-items: stretch; gap: 12px; height: 100%; text-align: left; color: var(--card-ink); position: relative; }
+  .card-face { display: flex; flex-direction: row; align-items: stretch; gap: 13px; height: 100%; text-align: left; color: var(--card-ink); position: relative; }
   .cf-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-  .cf-head { display: flex; flex-direction: row; align-items: center; gap: 6px; margin-bottom: 2px; }
-  .cf-sigil { display: inline-flex; }
-  .cf-sigil svg { width: 20px; height: 20px; color: var(--dc, var(--gold)); display: block; }
-  .cf-num { font-family: var(--serif); color: var(--gold); font-size: .78rem; letter-spacing: .14em; }
+  .cf-head { display: flex; flex-direction: row; align-items: baseline; gap: 8px; margin-bottom: 2px; }
+  .cf-num { font-family: var(--serif); color: var(--brass); font-size: .8rem; letter-spacing: .14em; flex: none; }
+  .cf-name { font-family: var(--serif); font-weight: 600; font-size: .92rem; letter-spacing: .06em; color: var(--card-ink); line-height: 1.3; }
   /* イラスト+重ね文字(画像は常に明色の紙調なので文字色は固定) */
-  .cf-art { position: relative; width: 45%; align-self: center; border-radius: 6px; overflow: hidden; flex: none;
-    border: 1px solid rgba(120,100,70,.16); }
+  .cf-art { position: relative; width: 45%; align-self: center; border-radius: 0; overflow: hidden; flex: none;
+    border: 1px solid rgba(35,43,51,.22); }
   .cf-art img { display: block; width: 100%; aspect-ratio: 832 / 512; object-fit: cover;
+    filter: sepia(.08) saturate(.92) contrast(1.02);
     user-select: none; -webkit-user-drag: none; pointer-events: none; }
   .cf-word { position: absolute; font-family: var(--serif); font-weight: 600; color: #3a362e;
     font-size: .8rem; letter-spacing: .08em; line-height: 1.35; text-align: left; white-space: nowrap;
@@ -155,13 +199,13 @@
   .cf-word .wmain { display: block; font-size: 1em; }
   .cf-word .wsub { display: block; font-size: .64em; color: #6e675a; letter-spacing: .14em; margin-top: 1px; }
   .card-piece .cf-word { font-size: .6rem; }
-  .cf-sep { width: 34px; height: 1px; background: var(--gold-soft); margin: 7px 0; position: relative; flex: none; }
-  .cf-sep::after { content: ""; position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; background: var(--gold-soft); transform: translate(-50%,-50%) rotate(45deg); }
-  .cf-desc { font-size: .74rem; color: var(--card-ink-soft); line-height: 1.6; flex: 1; }
-  .cf-domain { font-size: .62rem; letter-spacing: .1em; color: var(--dc, var(--gold)); margin-top: auto; padding-top: 6px; opacity: .85; }
+  .cf-sep { width: 100%; height: 0; border-top: 1px solid var(--hairline); margin: 8px 0; position: relative; flex: none; }
+  .cf-sep::after { content: ""; position: absolute; left: 0; top: -1px; width: 34px; border-top: 1px solid var(--brass-soft); }
+  .cf-desc { font-size: .74rem; color: var(--card-ink-soft); line-height: 1.65; flex: 1; }
+  .cf-domain { font-size: .6rem; letter-spacing: .2em; color: var(--dc, var(--brass)); margin-top: auto; padding-top: 8px; }
   .card-pick .check {
-    position: absolute; top: 12px; right: 12px; width: 22px; height: 22px; border-radius: 50%;
-    background: var(--accent); color: #fff; font-size: .74rem; font-weight: 700;
+    position: absolute; top: 11px; right: 11px; width: 21px; height: 21px; border-radius: 2px;
+    background: var(--accent-deep); color: #fff; font-size: .7rem; font-weight: 700;
     display: flex; align-items: center; justify-content: center;
     transform: scale(0); transition: transform .16s cubic-bezier(.34,1.56,.64,1);
   }
@@ -170,39 +214,55 @@
   .pick-bar {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
     background: var(--ui-bg); backdrop-filter: blur(10px);
-    border-top: 1px solid var(--line); box-shadow: 0 -6px 24px rgba(61,58,52,.07);
+    border-top: 1px solid var(--hairline-strong); box-shadow: 0 -6px 24px rgba(20,24,28,.08);
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    padding: 14px 20px; padding-bottom: max(14px, env(safe-area-inset-bottom));
+    padding: 13px 26px; padding-bottom: max(13px, env(safe-area-inset-bottom));
   }
-  .pick-count { color: var(--ink-soft); font-size: .9rem; font-variant-numeric: tabular-nums; }
-  .pick-count b { color: var(--ink); font-size: 1.15rem; font-family: var(--serif); }
+  .pick-count { color: var(--ink-soft); font-size: .84rem; letter-spacing: .06em; font-variant-numeric: tabular-nums; }
+  .pick-count b { color: var(--ink); font-size: 1.3rem; font-family: var(--serif); margin-right: 2px; }
 
-  /* --- ワークキャンバス --- */
+  /* --- ワークキャンバス(案A: 胡桃材の机) --- */
   .canvas-view {
     position: fixed; inset: 0; overflow: hidden; touch-action: none; perspective: 1300px;
     background:
+      radial-gradient(120% 100% at 50% 0%, rgba(255,244,214,.10) 0%, transparent 55%),
       var(--wood-tex),
-      radial-gradient(120% 90% at 50% 6%, var(--desk-a) 0%, var(--desk-b) 48%, var(--desk-c) 100%);
+      radial-gradient(115% 90% at 50% 8%, var(--desk-a) 0%, var(--desk-b) 52%, var(--desk-c) 100%);
   }
+  /* 強い内側ビネット(案A準拠) */
   .canvas-view::after {
     content: ""; position: absolute; inset: 0; pointer-events: none;
-    box-shadow: inset 0 0 260px rgba(40,28,10,.38);
-    background: radial-gradient(80% 70% at 50% 40%, transparent 55%, rgba(40,28,10,.16) 100%);
+    box-shadow: inset 0 0 220px rgba(12,8,3,.55);
+    background: radial-gradient(80% 70% at 50% 40%, transparent 52%, rgba(12,8,3,.22) 100%);
   }
-  .stage { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; }
+  /* 深緑フェルトのマット。機能(pan/zoom)を壊さぬよう .stage の外(canvas-view直下)に
+     固定配置し、カードと一緒には動かさない。pointer-events:none でパン操作を透過。 */
+  .mat {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: min(1120px, 84%); height: min(640px, 78%); pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(100% 100% at 50% 30%, rgba(255,255,255,.05), transparent 60%),
+      linear-gradient(160deg, #24382f, #1b2b24 70%);
+    border-radius: 14px; border: 1px solid rgba(180,154,110,.35);
+    box-shadow: inset 0 2px 14px rgba(0,0,0,.5), 0 6px 24px rgba(0,0,0,.45);
+  }
+  .mat::before { content: ""; position: absolute; inset: 9px; border: 1px solid rgba(180,154,110,.3); border-radius: 9px; }
+  .mat-label { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%);
+    font-family: var(--serif); font-size: .66rem; letter-spacing: .5em; text-indent: .5em; color: rgba(212,192,150,.5); }
+  .stage { position: absolute; left: 50%; top: 50%; width: 0; height: 0; z-index: 1; transform-style: preserve-3d; will-change: transform; }
   .card-piece {
     position: absolute; width: 252px; min-height: 150px; margin-left: -126px; margin-top: -75px;
     background: var(--card); background-image: var(--paper-tex);
-    border: 1px solid rgba(93,79,58,.3); border-radius: 10px; padding: 13px 13px 10px;
+    border: 1px solid rgba(60,50,35,.5); border-radius: 3px; padding: 13px 13px 10px;
     box-shadow:
-      0 calc(2px + 16px * var(--tiltf, 0)) calc(10px + 22px * var(--tiltf, 0)) rgba(35,26,12,.35),
-      0 2px 4px rgba(35,26,12,.18);
+      0 calc(3px + 16px * var(--tiltf, 0)) calc(12px + 22px * var(--tiltf, 0)) rgba(8,5,2,.5),
+      0 3px 6px rgba(8,5,2,.35);
     cursor: grab; user-select: none;
     transition: box-shadow .18s ease, transform .12s ease;
   }
   .card-piece::before {
-    content: ""; position: absolute; inset: 5px; border: 1px solid var(--frame);
-    border-radius: 6px; pointer-events: none;
+    content: ""; position: absolute; inset: 4px; border: 1px solid var(--frame);
+    border-radius: 0; pointer-events: none;
   }
   .card-piece .cf-desc { font-size: .63rem; }
   .card-piece:hover { box-shadow: 0 calc(6px + 16px * var(--tiltf, 0)) calc(16px + 22px * var(--tiltf, 0)) rgba(35,26,12,.4), 0 3px 6px rgba(35,26,12,.2); }
@@ -213,19 +273,22 @@
     position: fixed; top: 14px; left: 14px; right: 14px; z-index: 10;
     display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
     background: var(--ui-bg); backdrop-filter: blur(12px);
-    border: 1px solid var(--line); border-radius: 16px; padding: 9px 12px;
-    box-shadow: var(--shadow-md);
+    border: 1px solid var(--hairline-strong); border-radius: 6px; padding: 8px 14px;
+    box-shadow: 0 8px 26px rgba(12,8,3,.4);
   }
   .toolbar .spacer { flex: 1; }
   .toolbar .group { display: flex; align-items: center; gap: 6px; }
-  .toolbar label { font-size: .78rem; color: var(--ink-soft); display: flex; align-items: center; gap: 8px; font-weight: 600; }
+  .toolbar label { font-size: .78rem; color: var(--ink-soft); display: flex; align-items: center; gap: 8px; font-weight: 600; letter-spacing: .04em; }
+  .toolbar button { padding: 8px 16px; letter-spacing: .1em; text-indent: .1em; }
+  .toolbar button.ghost { padding: 8px 12px; }
   .icon-btn {
     width: 34px; height: 34px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
-    font-size: 1.1rem; line-height: 1; background: var(--btn-face); color: var(--ink); border: 1px solid var(--line);
-    border-radius: 10px; box-shadow: none;
+    font-size: 1.1rem; line-height: 1; letter-spacing: 0; text-indent: 0;
+    background: var(--btn-face); color: var(--ink); border: 1px solid var(--hairline-strong);
+    border-radius: 6px; box-shadow: none;
   }
   .icon-btn:hover { background: var(--btn-hover); }
-  #fs-btn[aria-pressed="true"] { background: var(--accent-tint); border-color: var(--gold-soft); color: var(--ink); }
+  #fs-btn[aria-pressed="true"] { background: var(--accent-tint); border-color: var(--accent); color: var(--accent-deep); }
   /* 全画面時の背景フォールバック(canvas-viewが全面を覆うため通常は見えないが念のため) */
   #app:fullscreen { background: var(--paper); }
   #app:-webkit-full-screen { background: var(--paper); }
@@ -244,15 +307,10 @@
     input[type=range] { width: 90px; }
   }
   /* --- 装飾 --- */
-  .ornament { display: flex; align-items: center; gap: 10px; width: min(240px, 60%); margin: 14px 0 0; color: var(--gold-soft); }
-  .ornament::before, .ornament::after { content: ""; flex: 1; height: 1px; background: currentColor; opacity: .7; }
-  .ornament i { width: 5px; height: 5px; background: currentColor; transform: rotate(45deg); flex: none; }
   .chips { display: flex; gap: 4px; margin-top: 7px; align-items: center; }
   .chip { width: 10px; height: 14px; border-radius: 2px; display: inline-block; }
   .chip-more { font-size: .7rem; color: var(--ink-faint); margin-left: 2px; }
-  .domain-head::after { content: ""; flex: 1; height: 1px; background: var(--line); margin-left: 6px; }
-  .dh-sigil { display: inline-flex; color: var(--dc, var(--gold)); }
-  .dh-sigil svg { width: 18px; height: 18px; }
+  .domain-head::after { content: ""; flex: 1; height: 1px; background: var(--hairline); margin-left: 2px; }
 
   /* --- モーション --- */
   @keyframes fade-in { from { opacity: 0; } }
@@ -265,87 +323,92 @@
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 
   /* --- 講師モードへの導線 / 受信箱 --- */
-  .home-foot { margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--line-soft); }
+  .home-foot { margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--hairline); }
   .teacher-link { color: var(--ink-faint); font-size: .82rem; }
   .teacher-link:hover { color: var(--ink); }
   .inbox-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; margin: 20px 0 8px; }
   .inbox-tools .paste { flex: 1; min-width: 220px; }
   .inbox-tools textarea { width: 100%; font: inherit; font-size: .82rem; color: var(--ink);
-    background: var(--btn-face); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; resize: vertical; min-height: 44px; }
+    background: var(--btn-face); border: 1px solid var(--hairline-strong); border-radius: 4px; padding: 8px 10px; resize: vertical; min-height: 44px; }
   .inbox-note { color: var(--ink-soft); font-size: .82rem; margin: 6px 0 0; }
-  .sub-badge { display: inline-block; font-size: .68rem; letter-spacing: .06em; color: var(--accent-deep);
-    border: 1px solid var(--accent); border-radius: 999px; padding: 1px 8px; margin-left: 6px; vertical-align: middle; }
+  .sub-badge { display: inline-block; font-size: .68rem; letter-spacing: .1em; color: var(--accent-deep);
+    border: 1px solid var(--accent); border-radius: 3px; padding: 1px 8px; margin-left: 6px; vertical-align: middle; }
 
   /* --- モーダル(提出ダイアログ) --- */
-  .modal-backdrop { position: fixed; inset: 0; z-index: 100; background: rgba(30,24,14,.5);
+  .modal-backdrop { position: fixed; inset: 0; z-index: 100; background: rgba(20,24,28,.55);
     display: flex; align-items: center; justify-content: center; padding: 20px; animation: fade-in .15s ease both; }
-  .modal { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow-lg);
-    width: min(460px, 100%); max-height: 90vh; overflow: auto; padding: 22px 22px 20px; }
-  .modal h2 { font-family: var(--serif); font-size: 1.2rem; margin: 0 0 6px; letter-spacing: .06em; }
+  .modal { background: var(--surface); border: 1px solid var(--hairline-strong); border-radius: 6px; box-shadow: var(--shadow-lg);
+    width: min(460px, 100%); max-height: 90vh; overflow: auto; padding: 24px 24px 20px; position: relative; }
+  .modal::before { content: ""; position: absolute; inset: 6px; border: 1px solid var(--frame); border-radius: 0; pointer-events: none; }
+  .modal h2 { font-family: var(--serif); font-size: 1.2rem; margin: 0 0 6px; letter-spacing: .14em; }
   .modal p.hint { color: var(--ink-soft); font-size: .84rem; margin: 0 0 16px; }
   .field { margin-bottom: 14px; }
-  .field > label { display: block; font-size: .8rem; font-weight: 600; color: var(--ink-soft); margin-bottom: 5px; }
+  .field > label { display: block; font-size: .8rem; font-weight: 600; color: var(--ink-soft); margin-bottom: 5px; letter-spacing: .06em; }
   .field input[type=text], .field textarea { width: 100%; font: inherit; color: var(--ink);
-    background: var(--btn-face); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; }
+    background: var(--btn-face); border: 1px solid var(--hairline-strong); border-radius: 4px; padding: 9px 11px; }
+  .field input[type=text]:focus, .field textarea:focus { outline: none; border-color: var(--accent); }
   .field textarea { resize: vertical; min-height: 78px; line-height: 1.5; }
   .field .counter { text-align: right; font-size: .72rem; color: var(--ink-faint); margin-top: 3px; font-variant-numeric: tabular-nums; }
   .field .counter.over { color: #c0562f; }
   .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; flex-wrap: wrap; }
   .link-box { width: 100%; font: inherit; font-size: .8rem; color: var(--ink); background: var(--btn-face);
-    border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; word-break: break-all; resize: vertical; min-height: 70px; }
+    border: 1px solid var(--hairline-strong); border-radius: 4px; padding: 9px 11px; word-break: break-all; resize: vertical; min-height: 70px; }
   .ok-msg { color: var(--accent-deep); font-size: .82rem; margin: 8px 0 0; min-height: 1.1em; }
 
   /* --- 閲覧専用(講師) --- */
   .card-piece.readonly { cursor: default; }
   .card-piece.readonly:hover {
-    box-shadow: 0 calc(2px + 16px * var(--tiltf, 0)) calc(10px + 22px * var(--tiltf, 0)) rgba(35,26,12,.35), 0 2px 4px rgba(35,26,12,.18); }
+    box-shadow: 0 calc(3px + 16px * var(--tiltf, 0)) calc(12px + 22px * var(--tiltf, 0)) rgba(8,5,2,.5), 0 3px 6px rgba(8,5,2,.35); }
   .viewer-info { position: fixed; left: 14px; bottom: 14px; z-index: 10; max-width: min(340px, calc(100% - 28px));
-    background: var(--ui-bg); backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: 16px;
+    background: var(--ui-bg); backdrop-filter: blur(12px); border: 1px solid var(--hairline-strong); border-radius: 6px;
     padding: 12px 15px; box-shadow: var(--shadow-md); }
-  .viewer-info .who { font-family: var(--serif); font-weight: 600; font-size: 1.05rem; }
+  .viewer-info .who { font-family: var(--serif); font-weight: 600; font-size: 1.05rem; letter-spacing: .06em; }
   .viewer-info .when { color: var(--ink-faint); font-size: .76rem; margin: 2px 0 8px; }
-  .viewer-info .note { font-size: .84rem; color: var(--ink); white-space: pre-wrap; border-top: 1px solid var(--line); padding-top: 8px; }
+  .viewer-info .note { font-size: .84rem; color: var(--ink); white-space: pre-wrap; border-top: 1px solid var(--hairline); padding-top: 8px; }
   .viewer-info .note.empty { color: var(--ink-faint); font-style: italic; }
 
   /* --- ライブ提出パネル(講師) --- */
-  .live-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
-    padding: 16px 18px; margin: 18px 0 8px; box-shadow: var(--shadow-sm); }
-  .live-panel h3 { font-family: var(--serif); font-size: 1.02rem; margin: 0 0 8px; letter-spacing: .04em; }
+  .live-panel { background: var(--surface); border: 1px solid var(--hairline-strong); border-radius: 6px;
+    padding: 16px 18px; margin: 18px 0 8px; box-shadow: var(--shadow-sm); position: relative; }
+  .live-panel h3 { font-family: var(--serif); font-size: 1.02rem; margin: 0 0 8px; letter-spacing: .14em; }
   .live-panel .live-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-  .live-code { font-family: var(--serif); font-size: 1.7rem; letter-spacing: .28em; color: var(--gold);
-    background: var(--gold-tint); border: 1px solid var(--gold-soft); border-radius: 12px; padding: 4px 14px 4px 20px; }
-  .live-link { font-size: .8rem; color: var(--ink); background: var(--btn-face); border: 1px solid var(--line);
-    border-radius: 10px; padding: 7px 10px; word-break: break-all; flex: 1; min-width: 200px; }
+  .live-code { font-family: var(--serif); font-size: 1.7rem; letter-spacing: .28em; color: var(--brass);
+    background: var(--gold-tint); border: 1px solid var(--brass-soft); border-radius: 4px; padding: 4px 14px 4px 20px; }
+  .live-link { font-size: .8rem; color: var(--ink); background: var(--btn-face); border: 1px solid var(--hairline-strong);
+    border-radius: 4px; padding: 7px 10px; word-break: break-all; flex: 1; min-width: 200px; }
   .live-status { display: inline-flex; align-items: center; gap: 7px; font-size: .82rem; color: var(--accent-deep); }
   .live-status .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 0 var(--accent-tint);
     animation: live-pulse 1.8s ease-out infinite; }
-  @keyframes live-pulse { 0%{ box-shadow: 0 0 0 0 rgba(111,154,145,.4);} 70%{ box-shadow: 0 0 0 10px rgba(111,154,145,0);} 100%{ box-shadow: 0 0 0 0 rgba(111,154,145,0);} }
+  @keyframes live-pulse { 0%{ box-shadow: 0 0 0 0 rgba(47,107,95,.4);} 70%{ box-shadow: 0 0 0 10px rgba(47,107,95,0);} 100%{ box-shadow: 0 0 0 0 rgba(47,107,95,0);} }
   .live-hint { color: var(--ink-soft); font-size: .8rem; margin: 8px 0 0; }
 
   /* --- 名簿ランチャー(名前チップ) --- */
   .roster-filter { width: 100%; font: inherit; color: var(--ink); background: var(--btn-face);
-    border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; margin: 18px 0 12px; }
+    border: 1px solid var(--hairline-strong); border-radius: 4px; padding: 9px 12px; margin: 18px 0 12px; }
+  .roster-filter:focus { outline: none; border-color: var(--accent); }
   .name-chips { display: flex; flex-wrap: wrap; gap: 10px; }
-  .name-chip { display: inline-flex; align-items: center; gap: 8px; background: var(--surface); color: var(--ink);
-    border: 1px solid var(--line); border-radius: 14px; padding: 12px 8px 12px 16px; box-shadow: var(--shadow-sm);
-    font-weight: 600; font-size: 1rem; }
-  .name-chip:hover { background: var(--btn-hover); border-color: var(--gold-soft); transform: translateY(-2px); box-shadow: var(--shadow-md); }
-  .name-chip .cardnum { font-size: .72rem; color: var(--ink-faint); font-weight: 500; font-variant-numeric: tabular-nums; }
-  .name-chip .chip-x { width: 24px; height: 24px; padding: 0; border-radius: 8px; font-size: .9rem; line-height: 1;
-    background: transparent; color: var(--ink-faint); border: 1px solid transparent; box-shadow: none; }
+  .name-chip { display: inline-flex; align-items: center; gap: 8px; background: var(--card); background-image: var(--paper-tex); color: var(--ink);
+    border: 1px solid var(--hairline-strong); border-radius: 3px; padding: 12px 8px 12px 16px; box-shadow: var(--shadow-sm);
+    font-family: var(--serif); font-weight: 600; font-size: 1rem; letter-spacing: .04em; position: relative;
+    transition: transform .14s ease, box-shadow .18s ease, border-color .18s ease; }
+  .name-chip::after { content: ""; position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px; background: var(--brass); opacity: .7; }
+  .name-chip:hover { border-color: var(--accent-deep); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .name-chip .cardnum { font-family: var(--sans); font-size: .72rem; color: var(--ink-faint); font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: 0; }
+  .name-chip .chip-x { width: 24px; height: 24px; padding: 0; border-radius: 3px; font-size: .9rem; line-height: 1;
+    background: transparent; color: var(--ink-faint); border: 1px solid transparent; box-shadow: none; letter-spacing: 0; text-indent: 0; }
   .name-chip .chip-x:hover { background: var(--gold-tint); color: var(--ink); }
 
   /* --- ビューア名前スイッチャー --- */
   .name-select { font: inherit; font-size: .85rem; color: var(--ink); background: var(--btn-face);
-    border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; max-width: 160px; }
+    border: 1px solid var(--hairline-strong); border-radius: 4px; padding: 6px 8px; max-width: 160px; }
 
   /* --- トースト --- */
   .toast { position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 20px); z-index: 200;
-    background: var(--ink); color: var(--paper); padding: 11px 18px; border-radius: 999px; font-size: .88rem;
+    background: var(--ink); color: #f7f4ec; padding: 11px 20px; border-radius: 4px; font-size: .86rem; letter-spacing: .06em;
     box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none; transition: opacity .22s ease, transform .22s ease; }
-  .toast.show { opacity: .96; transform: translate(-50%, 0); }
+  .toast.show { opacity: .97; transform: translate(-50%, 0); }
   .live-badge { display: inline-flex; align-items: center; gap: 6px; font-size: .76rem; color: var(--accent-deep);
-    background: var(--accent-tint); border-radius: 999px; padding: 3px 10px; }
+    background: var(--accent-tint); border-radius: 3px; padding: 3px 10px; }
 </style>
 </head>
 <body>
@@ -354,12 +417,13 @@
 "use strict";
 
 // ==== デッキデータ ====
+// roman=ローマ数字の索引 / jp=和名 / en=英語サブ / label=旧来の連結名(互換用)
 const DOMAINS = [
-  { key: "disconnection", label: "I. 断絶と拒絶" },
-  { key: "autonomy",      label: "II. 自律性と行動の損傷" },
-  { key: "limits",        label: "III. 制約の欠如" },
-  { key: "directedness",  label: "IV. 他者への追従" },
-  { key: "vigilance",     label: "V. 過剰警戒と抑制" },
+  { key: "disconnection", roman: "Ⅰ", jp: "断絶と拒絶",       en: "DISCONNECTION & REJECTION",        label: "Ⅰ ── 断絶と拒絶" },
+  { key: "autonomy",      roman: "Ⅱ", jp: "自律性と行動の損傷", en: "IMPAIRED AUTONOMY & PERFORMANCE", label: "Ⅱ ── 自律性と行動の損傷" },
+  { key: "limits",        roman: "Ⅲ", jp: "制約の欠如",        en: "IMPAIRED LIMITS",                  label: "Ⅲ ── 制約の欠如" },
+  { key: "directedness",  roman: "Ⅳ", jp: "他者への追従",      en: "OTHER-DIRECTEDNESS",               label: "Ⅳ ── 他者への追従" },
+  { key: "vigilance",     roman: "Ⅴ", jp: "過剰警戒と抑制",    en: "OVERVIGILANCE & INHIBITION",       label: "Ⅴ ── 過剰警戒と抑制" },
 ];
 
 // art: 生成イラスト(img/{id}.jpg)への重ね文字。pos はイラストの余白に合わせた配置
@@ -791,17 +855,8 @@ function domainById(key){ return _has(_domainMap, key) ? _domainMap[key] : undef
 // ==== カード面(共通意匠) ====
 const ROMAN = ["Ⅰ","Ⅱ","Ⅲ","Ⅳ","Ⅴ","Ⅵ","Ⅶ","Ⅷ","Ⅸ","Ⅹ","Ⅺ","Ⅻ","ⅩⅢ","ⅩⅣ","ⅩⅤ","ⅩⅥ","ⅩⅦ","ⅩⅧ"];
 const _schemaIndex = Object.fromEntries(SCHEMAS.map((s, i) => [s.id, i]));
-const SIGILS = {
-  disconnection: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.6 3.4a9 9 0 1 1-5.2 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
-  autonomy: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20v-8m0 0c0-4-2.6-6.4-6.5-6.4C5.6 9.6 8 12 12 12zm0 0c0-4 2.6-6.4 6.5-6.4C18.4 9.6 16 12 12 12z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>',
-  limits: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15m-7 1h14M5 8h14M5 8l-2.4 5a2.6 2.6 0 0 0 4.8 0zM19 8l-2.4 5a2.6 2.6 0 0 0 4.8 0z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  directedness: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9.5" cy="12" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="14.5" cy="12" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>',
-  vigilance: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 16.5l5-9 3.8 6.2 2.7-4.2 5.5 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-};
 function cardFace(s) {
   const d = domainById(s.domain);
-  const sigil = el("span", { class: "cf-sigil" });
-  sigil.innerHTML = SIGILS[d.key];
   const word = el("span", { class: "cf-word", style: s.art.pos },
     el("span", { class: "wmain" }, s.art.main));
   if (s.art.sub) word.appendChild(el("span", { class: "wsub" }, s.art.sub));
@@ -810,7 +865,9 @@ function cardFace(s) {
       el("img", { src: `img/${s.id}.jpg`, alt: s.name, draggable: "false" }),
       word),
     el("div", { class: "cf-body" },
-      el("div", { class: "cf-head" }, sigil, el("span", { class: "cf-num" }, ROMAN[_schemaIndex[s.id]])),
+      el("div", { class: "cf-head" },
+        el("span", { class: "cf-num" }, ROMAN[_schemaIndex[s.id]]),
+        el("span", { class: "cf-name" }, s.name)),
       el("span", { class: "cf-sep" }),
       el("div", { class: "cf-desc" }, s.desc),
       el("div", { class: "cf-domain" }, d.label))
@@ -877,14 +934,41 @@ function deleteSession(id) {
   render();
 }
 
+// ==== マストヘッド(題字)/ 奥付(コロフォン)====
+// 案Aの専門刊行物の佇まい: 英字オーバーライン + 明朝の大題字 + サブ + 二重罫。
+function masthead(opts) {
+  const head = el("header", { class:"masthead" });
+  head.appendChild(el("p", { class:"mh-over" }, opts.over));
+  head.appendChild(el("h1", { class:"mh-title", style: opts.titleStyle || "" }, opts.title));
+  if (opts.sub) head.appendChild(el("p", { class:"mh-sub" }, opts.sub));
+  head.appendChild(el("div", { class:"mh-rule", style: opts.ruleStyle || "" }));
+  if (opts.index) {
+    const idx = el("div", { class:"mh-index" });
+    ROMAN.forEach(r => idx.appendChild(el("span", null, r)));
+    head.appendChild(idx);
+  }
+  return head;
+}
+function colophon() {
+  return el("footer", { class:"colophon" },
+    el("p", { class:"pr" }, "Young の早期不適応スキーマ(18分類)に基づく"),
+    el("p", null, "データはこの端末内にのみ保存されます ── サーバーへの送信はありません")
+  );
+}
+
 function renderHome(app) {
+  app.appendChild(masthead({
+    over: "SCHEMA THERAPY WORKSHOP EDITION",
+    title: "スキーマ療法カード",
+    sub: "十八の早期不適応スキーマ ── 内省のための机上ワーク",
+    index: true,
+  }));
   const wrap = el("div", { class:"wrap" });
-  wrap.appendChild(el("div", { class:"page-head" },
-    el("h1", null, "スキーマ療法カード"),
-    el("p", { class:"subtitle" }, "気になるカードを選び、机の上に広げて、いまの自分を静かに見つめる。"),
-    el("div", { class:"ornament" }, el("i"))
-  ));
-  wrap.appendChild(el("button", { class:"new-btn", onclick: () => { state.currentSessionId = createSession(); go("select"); } }, "＋ 新しいワークを始める"));
+  wrap.appendChild(el("p", { class:"lede" }, "気になるカードを選び、机の上に広げて、いまの自分を静かに見つめる。"));
+  wrap.appendChild(el("div", { class:"cta-row" },
+    el("button", { class:"new-btn", onclick: () => { state.currentSessionId = createSession(); go("select"); } }, "＋ 新しいワークを始める")));
+
+  wrap.appendChild(el("div", { class:"sec-head" }, el("span", { class:"no" }, "凡例"), el("h2", null, "これまでのワーク")));
 
   const sessions = [...state.db.sessions].sort((a,b) => b.updatedAt.localeCompare(a.updatedAt));
   if (sessions.length === 0) {
@@ -928,6 +1012,7 @@ function renderHome(app) {
       subCount ? `講師モード(受け取った提出 ${subCount}件)` : "講師モード")
   );
   wrap.appendChild(foot);
+  wrap.appendChild(colophon());
 
   app.appendChild(wrap);
 }
@@ -971,12 +1056,14 @@ function livePanel() {
 }
 
 function renderInbox(app) {
+  app.appendChild(masthead({
+    over: "INSTRUCTOR ・ ROSTER",
+    title: "講師モード ・ 名簿",
+    titleStyle: "font-size:1.5rem",
+    sub: "名前をクリックすると、その人の机をそのまま再現します。",
+    ruleStyle: "margin-top:14px",
+  }));
   const wrap = el("div", { class:"wrap" });
-  wrap.appendChild(el("div", { class:"page-head" },
-    el("h1", null, "講師モード ・ 名簿"),
-    el("p", { class:"subtitle" }, "名前をクリックすると、その人の机をそのまま再現します。"),
-    el("div", { class:"ornament" }, el("i"))
-  ));
 
   wrap.appendChild(livePanel());
 
@@ -1035,12 +1122,14 @@ function renderSelect(app) {
   if (!session) { go("home"); return; }
   const chosen = new Set(session.selectedCardIds);
 
+  app.appendChild(masthead({
+    over: "SELECT YOUR CARDS",
+    title: "カードを選ぶ",
+    titleStyle: "font-size:1.5rem",
+    ruleStyle: "margin-top:14px",
+  }));
   const wrap = el("div", { class:"wrap" });
-  wrap.appendChild(el("div", { class:"page-head" },
-    el("h1", null, "当てはまるカードを選ぶ"),
-    el("p", { class:"subtitle" }, "今の自分に当てはまる、気になるカードを選んでください。数は多くても少なくてもかまいません。"),
-    el("div", { class:"ornament" }, el("i"))
-  ));
+  wrap.appendChild(el("p", { class:"lede" }, "今の自分に当てはまる、気になるカードを選んでください。数は多くても少なくてもかまいません。"));
 
   const count = el("span", { class:"pick-count" }, el("b", null, String(chosen.size)), " 枚選択中");
   const updateCount = () => { count.textContent = ""; count.appendChild(el("b", null, String(chosen.size))); count.appendChild(document.createTextNode(" 枚選択中")); };
@@ -1055,10 +1144,10 @@ function renderSelect(app) {
   let pickIndex = 0;
   for (const d of DOMAINS) {
     const section = el("div", { class:"domain-section" });
-    const dh = el("div", { class:"domain-head", style:`--dc:var(--dom-${d.key})` });
-    const dsig = el("span", { class:"dh-sigil" });
-    dsig.innerHTML = SIGILS[d.key];
-    dh.append(dsig, document.createTextNode(d.label));
+    const dh = el("div", { class:"domain-head", style:`--dc:var(--dom-${d.key})` },
+      el("span", { class:"dnum" }, d.roman),
+      el("h3", null, d.jp),
+      el("span", { class:"den" }, d.en));
     section.appendChild(dh);
     const grid = el("div", { class:"grid" });
     for (const s of SCHEMAS.filter(x => x.domain === d.key)) {
@@ -1172,6 +1261,9 @@ function positionPiece(piece, p) {
 // board から机(viewport)を組み立てる。session/提出のどちらでも同じ描画。
 function buildBoardView(board) {
   viewportEl = el("div", { class:"canvas-view" });
+  // 深緑フェルトのマット: canvas-view直下(stageの外)に固定配置し、pan/zoomに追従させない。
+  // pointer-events:none なので余白ドラッグのパン判定(target===viewport/stage)も阻害しない。
+  viewportEl.appendChild(el("div", { class:"mat" }, el("span", { class:"mat-label" }, "SCHEMA THERAPY")));
   stageEl = el("div", { class:"stage" });
   viewportEl.appendChild(stageEl);
 
