@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>案B セミナールーム — デザイン提案</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700&display=swap">
+<style>
+  :root {
+    --stage: #10181a;         /* 深い青緑墨 — 会場の暗がり */
+    --stage-2: #162124;
+    --panel: #1c282b;
+    --panel-edge: rgba(200,176,128,.22);
+    --card: #f6f1e4;          /* 象牙 — 暗がりで発光する紙 */
+    --card-ink: #35322a;
+    --card-ink-soft: #6b6456;
+    --ink: #e6dfd0;           /* 会場UIの文字 */
+    --ink-soft: #a49c8a;
+    --ink-faint: #6f695c;
+    --brass: #c8b080;         /* 真鍮 — 会場の金物 */
+    --brass-deep: #9a8358;
+    --accent: #7fb3a6;        /* 灯りのセージ */
+    --dom-disconnection: #c98f63;
+    --dom-autonomy: #7cab a1;
+    --dom-autonomy: #7caba1;
+    --dom-limits: #a293bd;
+    --dom-directedness: #86a8c4;
+    --dom-vigilance: #a4b077;
+    --serif: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+    --sans: system-ui, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    --paper-tex: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.36 0 0 0 0 0.26 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23p)'/%3E%3C/svg%3E");
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--sans); color: var(--ink); background: #0a0f10; line-height: 1.6; }
+
+  /* ===== 提案ページ用の枠 ===== */
+  .mock-nav { position: sticky; top: 0; z-index: 50; display: flex; align-items: baseline; gap: 14px;
+    background: #000; color: #e6dfd0; padding: 10px 18px; font-size: .82rem; border-bottom: 1px solid rgba(200,176,128,.3); }
+  .mock-nav b { font-family: var(--serif); font-size: .95rem; letter-spacing: .06em; color: var(--brass); }
+  .mock-nav a { color: var(--brass); text-decoration: none; margin-left: auto; }
+  .screen { max-width: 1240px; margin: 34px auto; padding: 0 18px; }
+  .screen-label { font-size: .78rem; letter-spacing: .18em; color: #8a8375; margin: 0 0 8px 4px; }
+  .frame { border-radius: 10px; overflow: hidden; border: 1px solid rgba(200,176,128,.25);
+    box-shadow: 0 1px 3px rgba(0,0,0,.6), 0 18px 54px rgba(0,0,0,.55); }
+  .chrome { display: flex; align-items: center; gap: 6px; background: #060909; padding: 8px 12px; border-bottom: 1px solid rgba(200,176,128,.18); }
+  .chrome i { width: 9px; height: 9px; border-radius: 50%; background: #3a4446; }
+  .chrome .url { flex: 1; text-align: center; font-size: .7rem; color: #7d766a; background: rgba(255,255,255,.06);
+    border-radius: 6px; padding: 2px 10px; margin: 0 40px; }
+
+  /* ===== 案B の設計言語 ===== */
+  .app { position: relative; padding: 0 0 56px; overflow: hidden;
+    background:
+      radial-gradient(90% 60% at 50% -5%, rgba(255,222,160,.10), transparent 60%),
+      radial-gradient(140% 120% at 50% 20%, var(--stage-2) 0%, var(--stage) 60%, #0b1112 100%); }
+  .app::before { content: ""; position: absolute; inset: 0; pointer-events: none; background-image: var(--paper-tex); opacity: .5; }
+  button { font: inherit; cursor: pointer; }
+
+  .masthead { position: relative; text-align: center; padding: 44px 20px 0; }
+  .mh-over { font-size: .64rem; letter-spacing: .5em; text-indent: .5em; color: var(--brass); margin: 0 0 14px; }
+  .mh-title { font-family: var(--serif); font-weight: 600; font-size: 2.2rem; letter-spacing: .3em; text-indent: .3em; margin: 0; color: #f1ead9;
+    text-shadow: 0 0 34px rgba(255,226,170,.18); }
+  .mh-sub { font-size: .72rem; letter-spacing: .3em; text-indent: .3em; color: var(--ink-soft); margin: 10px 0 0; }
+  .mh-orn { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 20px auto 0; width: min(560px, 78%); color: var(--brass-deep); }
+  .mh-orn::before, .mh-orn::after { content: ""; flex: 1; border-top: 1px solid currentColor; opacity: .6; }
+  .mh-orn i { width: 5px; height: 5px; background: var(--brass); transform: rotate(45deg); }
+
+  .wrap { position: relative; max-width: 1160px; margin: 0 auto; padding: 36px 26px 0; }
+  .lede { text-align: center; color: var(--ink-soft); font-size: .9rem; margin: 0 0 30px; }
+  .cta-row { display: flex; justify-content: center; gap: 12px; margin-bottom: 44px; }
+  .btn-primary { background: linear-gradient(180deg, #d8c295, #b89a67); color: #241d10; border: 1px solid #8a7347;
+    border-radius: 999px; padding: 13px 46px; font-weight: 700; letter-spacing: .2em; text-indent: .2em; font-size: .92rem;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.4), 0 8px 22px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.4); }
+  .btn-ghost { background: transparent; color: var(--ink-soft); border: 1px solid rgba(200,176,128,.35); border-radius: 999px; padding: 13px 30px; letter-spacing: .1em; }
+
+  .sec-head { display: flex; align-items: center; gap: 14px; margin: 0 0 16px; }
+  .sec-head h2 { font-family: var(--serif); font-size: 1rem; font-weight: 600; letter-spacing: .2em; margin: 0; color: #ddd5c2; }
+  .sec-head::before, .sec-head::after { content: ""; flex: 1; border-top: 1px solid rgba(200,176,128,.25); }
+  .session-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+  .session-item { background: linear-gradient(180deg, var(--panel), #172124); border: 1px solid var(--panel-edge);
+    border-radius: 12px; padding: 16px 18px; display: flex; align-items: center; gap: 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.35); }
+  .session-item:hover { border-color: rgba(200,176,128,.45); }
+  .session-item .t { flex: 1; font-weight: 600; color: #ece5d3; }
+  .session-item .t small { display: block; font-weight: 400; color: var(--ink-faint); font-size: .76rem; margin-top: 3px; }
+  .session-item .open { color: var(--brass); background: transparent; border: 1px solid rgba(200,176,128,.4); border-radius: 999px; padding: 6px 18px; font-size: .8rem; letter-spacing: .1em; }
+
+  .colophon { margin-top: 54px; text-align: center; }
+  .colophon .orn { display: flex; align-items: center; justify-content: center; gap: 12px; width: min(340px, 70%); margin: 0 auto 12px; color: var(--brass-deep); }
+  .colophon .orn::before, .colophon .orn::after { content: ""; flex: 1; border-top: 1px solid currentColor; opacity: .55; }
+  .colophon .orn i { width: 4px; height: 4px; background: var(--brass); transform: rotate(45deg); }
+  .colophon p { margin: 2px 0; font-size: .7rem; color: var(--ink-faint); letter-spacing: .1em; }
+  .colophon .pr { font-family: var(--serif); color: var(--ink-soft); font-size: .76rem; }
+
+  /* --- カード選択 --- */
+  .domain-head { display: flex; align-items: center; gap: 12px; margin: 32px 0 14px; }
+  .domain-head .dnum { font-family: var(--serif); font-size: 1.2rem; color: var(--dc, var(--brass)); }
+  .domain-head h3 { font-family: var(--serif); font-size: 1.04rem; font-weight: 600; letter-spacing: .14em; margin: 0; color: #e7e0cd; }
+  .domain-head::after { content: ""; flex: 1; border-top: 1px solid rgba(200,176,128,.2); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 18px; }
+  .card-pick { position: relative; background: var(--card); background-image: var(--paper-tex);
+    border: 1px solid rgba(30,24,14,.7); border-radius: 8px; padding: 16px 15px 12px; cursor: pointer; color: var(--card-ink);
+    box-shadow: 0 2px 5px rgba(0,0,0,.45), 0 14px 30px rgba(0,0,0,.35);
+    transition: transform .16s, box-shadow .2s; }
+  .card-pick::before { content: ""; position: absolute; inset: 5px; border: 1px solid rgba(154,131,88,.5); border-radius: 5px; pointer-events: none; }
+  .card-pick:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,.5), 0 22px 44px rgba(0,0,0,.45); }
+  .card-pick.selected { box-shadow: 0 0 0 2px var(--brass), 0 0 26px rgba(216,194,149,.25), 0 14px 30px rgba(0,0,0,.4); }
+  .card-pick .check { position: absolute; top: 11px; right: 11px; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--brass); color: #241d10; font-size: .72rem; font-weight: 700; display: none; align-items: center; justify-content: center; }
+  .card-pick.selected .check { display: flex; }
+  .card-pick .cf-head { margin-right: 26px; }
+
+  .card-face { display: flex; gap: 13px; text-align: left; }
+  .cf-art { position: relative; width: 45%; flex: none; align-self: center; overflow: hidden; border-radius: 4px;
+    border: 1px solid rgba(60,50,30,.3); }
+  .cf-art img { display: block; width: 100%; aspect-ratio: 832/512; object-fit: cover; }
+  .cf-word { position: absolute; font-family: var(--serif); font-weight: 600; color: #3a362e; font-size: .8rem;
+    letter-spacing: .08em; line-height: 1.35; white-space: nowrap;
+    text-shadow: 0 0 8px rgba(248,244,234,.95), 0 0 3px rgba(248,244,234,.9); }
+  .cf-word .wsub { display: block; font-size: .64em; color: #6e675a; letter-spacing: .14em; }
+  .cf-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .cf-head { display: flex; align-items: baseline; gap: 8px; }
+  .cf-num { font-family: var(--serif); color: var(--brass-deep); font-size: .8rem; letter-spacing: .14em; }
+  .cf-name { font-family: var(--serif); font-weight: 600; font-size: .92rem; letter-spacing: .06em; }
+  .cf-sep { width: 34px; border-top: 1px solid var(--brass-deep); margin: 8px 0; }
+  .cf-desc { font-size: .74rem; color: var(--card-ink-soft); line-height: 1.65; flex: 1; }
+  .cf-domain { font-size: .6rem; letter-spacing: .2em; color: var(--dc, var(--brass-deep)); margin-top: 8px; }
+
+  .pick-bar { position: sticky; bottom: 0; margin-top: 32px; background: rgba(10,15,16,.82); backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(200,176,128,.3); display: flex; align-items: center; justify-content: space-between; padding: 13px 26px; }
+  .pick-count { font-size: .84rem; color: var(--ink-soft); }
+  .pick-count b { font-family: var(--serif); font-size: 1.3rem; color: var(--brass); margin-right: 2px; }
+
+  /* --- 机(スポットライトの卓) --- */
+  .desk { position: relative; height: 620px; overflow: hidden;
+    background:
+      radial-gradient(60% 46% at 50% 40%, rgba(255,228,170,.16), transparent 62%),
+      radial-gradient(120% 110% at 50% 30%, #1d2a24 0%, #121c18 45%, #070b0a 100%); }
+  .desk::before { content: ""; position: absolute; inset: 0; background-image: var(--paper-tex); opacity: .45; }
+  .desk::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 240px rgba(0,0,0,.75); }
+  .toolbar { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); z-index: 5; display: flex; align-items: center; gap: 12px;
+    background: rgba(16,24,26,.78); backdrop-filter: blur(12px); border: 1px solid rgba(200,176,128,.35);
+    border-radius: 999px; padding: 8px 18px; box-shadow: 0 10px 30px rgba(0,0,0,.55); font-size: .78rem; color: var(--ink-soft); }
+  .toolbar .tt { font-family: var(--serif); letter-spacing: .1em; font-weight: 600; font-size: .84rem; color: #ece5d3; padding-right: 12px; border-right: 1px solid rgba(200,176,128,.3); }
+  .toolbar .range { width: 90px; height: 3px; background: rgba(200,176,128,.3); border-radius: 99px; position: relative; }
+  .toolbar .range i { position: absolute; left: 55%; top: 50%; width: 13px; height: 13px; border-radius: 50%;
+    background: var(--brass); transform: translate(-50%,-50%); box-shadow: 0 0 8px rgba(216,194,149,.5); }
+  .toolbar .submit { background: linear-gradient(180deg, #d8c295, #b89a67); color: #241d10; border: none; border-radius: 999px;
+    padding: 7px 20px; font-size: .78rem; letter-spacing: .12em; font-weight: 700; }
+  .live-chip { position: absolute; right: 18px; top: 15px; z-index: 5; display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(16,24,26,.78); border: 1px solid rgba(127,179,166,.5); color: #a9cec4; font-size: .74rem; letter-spacing: .1em;
+    border-radius: 999px; padding: 7px 14px; }
+  .live-chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+  .card-piece { position: absolute; width: 252px; background: var(--card); background-image: var(--paper-tex);
+    border: 1px solid rgba(20,16,8,.8); border-radius: 8px; padding: 13px 13px 10px; color: var(--card-ink);
+    box-shadow: 0 0 0 1px rgba(216,194,149,.12), 0 20px 38px rgba(0,0,0,.65), 0 4px 8px rgba(0,0,0,.5); }
+  .card-piece::before { content: ""; position: absolute; inset: 4px; border: 1px solid rgba(154,131,88,.5); border-radius: 5px; pointer-events: none; }
+  .card-piece .cf-desc { font-size: .62rem; }
+  .card-piece .cf-word { font-size: .6rem; }
+  .card-piece .cf-name { font-size: .8rem; }
+</style>
+</head>
+<body>
+<nav class="mock-nav"><b>案B ── セミナールーム</b><span>暗い会場に浮かぶ象牙のカード:投影・対面ワークの臨場感</span><a href="index.html">← 3案の比較へ戻る</a></nav>
+
+<!-- ============ 画面1: ホーム ============ -->
+<section class="screen">
+  <p class="screen-label">SCREEN 01 ── ホーム(開演前)</p>
+  <div class="frame">
+    <div class="chrome"><i></i><i></i><i></i><span class="url">schema-therapy-card ── ホーム</span></div>
+    <div class="app">
+      <header class="masthead">
+        <p class="mh-over">SCHEMA THERAPY WORKSHOP</p>
+        <h1 class="mh-title">スキーマ療法カード</h1>
+        <p class="mh-sub">十八の早期不適応スキーマ ── 内省のための机上ワーク</p>
+        <div class="mh-orn"><i></i></div>
+      </header>
+      <div class="wrap">
+        <p class="lede">自分に響くカードを選び、机に並べ、距離を変えながら眺める。</p>
+        <div class="cta-row">
+          <button class="btn-primary">ワークを始める</button>
+          <button class="btn-ghost">参加コードで参加</button>
+        </div>
+        <div class="sec-head"><h2>これまでのワーク</h2></div>
+        <div class="session-list">
+          <div class="session-item"><div class="t">7月19日のワーク<small>カード 5枚 ── 2026年7月19日 14:02</small></div><button class="open">ひらく</button></div>
+          <div class="session-item"><div class="t">初回セッション<small>カード 3枚 ── 2026年7月12日 10:31</small></div><button class="open">ひらく</button></div>
+        </div>
+        <footer class="colophon">
+          <div class="orn"><i></i></div>
+          <p class="pr">Young の早期不適応スキーマ(18分類)に基づく</p>
+          <p>データはこの端末内にのみ保存されます ── サーバーへの送信はありません</p>
+        </footer>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 画面2: カード選択 ============ -->
+<section class="screen">
+  <p class="screen-label">SCREEN 02 ── カードを選ぶ(暗がりに発光する紙)</p>
+  <div class="frame">
+    <div class="chrome"><i></i><i></i><i></i><span class="url">schema-therapy-card ── カードを選ぶ</span></div>
+    <div class="app">
+      <header class="masthead">
+        <p class="mh-over">SELECT YOUR CARDS</p>
+        <h1 class="mh-title" style="font-size:1.5rem">カードを選ぶ</h1>
+        <div class="mh-orn" style="margin-top:16px"><i></i></div>
+      </header>
+      <div class="wrap">
+        <div class="domain-head" style="--dc:var(--dom-disconnection)"><span class="dnum">Ⅰ</span><h3>断絶と拒絶</h3></div>
+        <div class="grid">
+          <div class="card-pick selected" style="--dc:var(--dom-disconnection)">
+            <span class="check">✓</span>
+            <div class="card-face">
+              <div class="cf-art"><img src="../img/abandonment.jpg" alt=""><span class="cf-word" style="right:6%;top:9%;text-align:right">見捨てられ<span class="wsub">不安定</span></span></div>
+              <div class="cf-body">
+                <div class="cf-head"><span class="cf-num">Ⅰ</span><span class="cf-name">見捨てられ／不安定</span></div>
+                <span class="cf-sep"></span>
+                <div class="cf-desc">支えてくれる人はいずれ去る、頼れない、と感じる。人との別れや不在に強い不安を覚える。</div>
+                <div class="cf-domain">Ⅰ ── 断絶と拒絶</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-pick" style="--dc:var(--dom-disconnection)">
+            <span class="check">✓</span>
+            <div class="card-face">
+              <div class="cf-art"><img src="../img/mistrust.jpg" alt=""><span class="cf-word" style="left:50%;bottom:7%;transform:translateX(-50%);text-align:center">不信／虐待</span></div>
+              <div class="cf-body">
+                <div class="cf-head"><span class="cf-num">Ⅱ</span><span class="cf-name">不信／虐待</span></div>
+                <span class="cf-sep"></span>
+                <div class="cf-desc">他人はいつか自分を傷つけ、利用し、裏切ると身構える。人の善意を素直に受け取りにくい。</div>
+                <div class="cf-domain">Ⅰ ── 断絶と拒絶</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-pick" style="--dc:var(--dom-disconnection)">
+            <span class="check">✓</span>
+            <div class="card-face">
+              <div class="cf-art"><img src="../img/defectiveness.jpg" alt=""><span class="cf-word" style="left:50%;top:9%;transform:translateX(-50%);text-align:center">欠陥／恥</span></div>
+              <div class="cf-body">
+                <div class="cf-head"><span class="cf-num">Ⅳ</span><span class="cf-name">欠陥／恥</span></div>
+                <span class="cf-sep"></span>
+                <div class="cf-desc">自分は欠けていて価値がない、知られたら見捨てられると感じる。強い恥や自己否定を伴う。</div>
+                <div class="cf-domain">Ⅰ ── 断絶と拒絶</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="domain-head" style="--dc:var(--dom-vigilance);margin-top:34px"><span class="dnum">Ⅴ</span><h3>過剰警戒と抑制</h3></div>
+        <div class="grid">
+          <div class="card-pick" style="--dc:var(--dom-vigilance)">
+            <span class="check">✓</span>
+            <div class="card-face">
+              <div class="cf-art"><img src="../img/unrelenting-standards.jpg" alt=""><span class="cf-word" style="left:6%;top:34%">厳密な基準<span class="wsub">過度の批判</span></span></div>
+              <div class="cf-body">
+                <div class="cf-head"><span class="cf-num">ⅩⅦ</span><span class="cf-name">厳密な基準／過度の批判</span></div>
+                <span class="cf-sep"></span>
+                <div class="cf-desc">非常に高い基準を自分(や他者)に課し、決して十分と思えず自分を厳しく批判する。</div>
+                <div class="cf-domain">Ⅴ ── 過剰警戒と抑制</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-pick selected" style="--dc:var(--dom-vigilance)">
+            <span class="check">✓</span>
+            <div class="card-face">
+              <div class="cf-art"><img src="../img/emotional-inhibition.jpg" alt=""><span class="cf-word" style="right:6%;top:8%;text-align:right">感情抑制</span></div>
+              <div class="cf-body">
+                <div class="cf-head"><span class="cf-num">ⅩⅥ</span><span class="cf-name">感情抑制</span></div>
+                <span class="cf-sep"></span>
+                <div class="cf-desc">怒り・喜び・弱さなどの感情や衝動を、恥や制御のために抑え込んでしまう。</div>
+                <div class="cf-domain">Ⅴ ── 過剰警戒と抑制</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-pick" style="--dc:var(--dom-vigilance)">
+            <span class="check">✓</span>
+            <div class="card-face">
+              <div class="cf-art"><img src="../img/punitiveness.jpg" alt=""><span class="cf-word" style="left:8%;bottom:10%">罰</span></div>
+              <div class="cf-body">
+                <div class="cf-head"><span class="cf-num">ⅩⅧ</span><span class="cf-name">罰</span></div>
+                <span class="cf-sep"></span>
+                <div class="cf-desc">過ちは厳しく罰せられるべきだと考え、自分や他者のミスに寛容になれない。</div>
+                <div class="cf-domain">Ⅴ ── 過剰警戒と抑制</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="pick-bar">
+          <span class="pick-count"><b>2</b> 枚 えらんでいます</span>
+          <button class="btn-primary" style="padding:10px 34px">机に並べる</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 画面3: 机 ============ -->
+<section class="screen">
+  <p class="screen-label">SCREEN 03 ── 机(ワーク) ── スポットライトの卓・ライブ提出の灯り</p>
+  <div class="frame">
+    <div class="chrome"><i></i><i></i><i></i><span class="url">schema-therapy-card ── 机</span></div>
+    <div class="desk">
+      <div class="toolbar">
+        <span class="tt">7月19日のワーク</span>
+        <span>ズーム</span><span class="range"><i></i></span>
+        <span>チルト</span><span class="range"><i style="left:30%"></i></span>
+        <button class="submit">講師に提出</button>
+      </div>
+      <div class="live-chip"><i></i>LIVE ── 参加コード 48213</div>
+      <div class="card-piece" style="left:16%;top:24%;transform:rotate(-2.4deg)">
+        <div class="card-face">
+          <div class="cf-art"><img src="../img/abandonment.jpg" alt=""><span class="cf-word" style="right:6%;top:9%;text-align:right">見捨てられ<span class="wsub">不安定</span></span></div>
+          <div class="cf-body">
+            <div class="cf-head"><span class="cf-num">Ⅰ</span><span class="cf-name">見捨てられ／不安定</span></div>
+            <span class="cf-sep"></span>
+            <div class="cf-desc">支えてくれる人はいずれ去る、頼れない、と感じる。</div>
+            <div class="cf-domain">Ⅰ ── 断絶と拒絶</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-piece" style="left:45%;top:47%;transform:rotate(1.6deg)">
+        <div class="card-face">
+          <div class="cf-art"><img src="../img/emotional-inhibition.jpg" alt=""><span class="cf-word" style="right:6%;top:8%;text-align:right">感情抑制</span></div>
+          <div class="cf-body">
+            <div class="cf-head"><span class="cf-num">ⅩⅥ</span><span class="cf-name">感情抑制</span></div>
+            <span class="cf-sep"></span>
+            <div class="cf-desc">怒り・喜び・弱さなどの感情や衝動を、抑え込んでしまう。</div>
+            <div class="cf-domain">Ⅴ ── 過剰警戒と抑制</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-piece" style="left:62%;top:16%;transform:rotate(3deg)">
+        <div class="card-face">
+          <div class="cf-art"><img src="../img/self-sacrifice.jpg" alt=""><span class="cf-word" style="right:7%;top:10%;text-align:right">自己犠牲</span></div>
+          <div class="cf-body">
+            <div class="cf-head"><span class="cf-num">ⅩⅢ</span><span class="cf-name">自己犠牲</span></div>
+            <span class="cf-sep"></span>
+            <div class="cf-desc">他者の苦痛を放っておけず、自分の必要を後回しにして尽くしすぎてしまう。</div>
+            <div class="cf-domain">Ⅳ ── 他者への追従</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

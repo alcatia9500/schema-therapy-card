@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>案C カーム・プロフェッショナル — デザイン提案</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700&display=swap">
+<style>
+  :root {
+    --bg: #f6f8f7;            /* 診療所の白 — わずかに緑がかる */
+    --surface: #ffffff;
+    --ink: #2c3a3d;           /* 深いスレート */
+    --ink-soft: #5f7075;
+    --ink-faint: #97a5a8;
+    --line: #e2e8e6;
+    --line-strong: #cbd6d3;
+    --sage: #4e8578;          /* 主要アクション */
+    --sage-deep: #3d6b60;
+    --sage-tint: #eaf2ef;
+    --card: #fffefb;
+    --card-ink: #3a3f38;
+    --card-ink-soft: #6f7568;
+    --dom-disconnection: #c08457;
+    --dom-autonomy: #629b90;
+    --dom-limits: #8d7fae;
+    --dom-directedness: #6b93b5;
+    --dom-vigilance: #8ba05e;
+    --serif: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+    --sans: system-ui, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    --sh-sm: 0 1px 2px rgba(44,58,61,.05), 0 4px 14px rgba(44,58,61,.05);
+    --sh-md: 0 2px 4px rgba(44,58,61,.06), 0 12px 30px rgba(44,58,61,.09);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--sans); color: var(--ink); background: #e6ebe9; line-height: 1.65; }
+
+  /* ===== 提案ページ用の枠 ===== */
+  .mock-nav { position: sticky; top: 0; z-index: 50; display: flex; align-items: baseline; gap: 14px;
+    background: #2c3a3d; color: #eef2f1; padding: 10px 18px; font-size: .82rem; }
+  .mock-nav b { font-size: .95rem; letter-spacing: .04em; }
+  .mock-nav a { color: #9fc4b8; text-decoration: none; margin-left: auto; }
+  .screen { max-width: 1240px; margin: 34px auto; padding: 0 18px; }
+  .screen-label { font-size: .78rem; letter-spacing: .18em; color: #5f7075; margin: 0 0 8px 4px; }
+  .frame { background: var(--bg); border-radius: 12px; overflow: hidden;
+    box-shadow: 0 1px 3px rgba(30,42,45,.14), 0 16px 44px rgba(30,42,45,.14); border: 1px solid rgba(30,42,45,.1); }
+  .chrome { display: flex; align-items: center; gap: 6px; background: #eef1f0; padding: 8px 12px; border-bottom: 1px solid rgba(30,42,45,.07); }
+  .chrome i { width: 9px; height: 9px; border-radius: 50%; background: #cbd6d3; }
+  .chrome .url { flex: 1; text-align: center; font-size: .7rem; color: #7d8b8e; background: #fff;
+    border-radius: 6px; padding: 2px 10px; margin: 0 40px; }
+
+  /* ===== 案C の設計言語 ===== */
+  .app { background: var(--bg); padding: 0 0 56px; }
+  button { font: inherit; cursor: pointer; }
+
+  /* --- アプリバー(常設ヘッダ=所属の明示) --- */
+  .appbar { display: flex; align-items: center; gap: 12px; padding: 14px 28px; background: var(--surface);
+    border-bottom: 1px solid var(--line); }
+  .logo { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 10px;
+    background: var(--sage-tint); color: var(--sage-deep); }
+  .logo svg { width: 20px; height: 20px; }
+  .appbar .name { font-weight: 700; letter-spacing: .05em; font-size: .98rem; }
+  .appbar .name small { display: block; font-weight: 500; font-size: .64rem; letter-spacing: .18em; color: var(--ink-faint); }
+  .appbar .right { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: .76rem; color: var(--ink-soft); }
+  .badge-local { display: inline-flex; align-items: center; gap: 6px; background: var(--sage-tint); color: var(--sage-deep);
+    border-radius: 999px; padding: 4px 12px; font-weight: 600; }
+  .badge-local svg { width: 13px; height: 13px; }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 44px 28px 0; }
+
+  /* --- ステップ表示(進行の明快さ=信頼) --- */
+  .steps { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 0 36px; font-size: .78rem; color: var(--ink-faint); }
+  .steps .st { display: flex; align-items: center; gap: 8px; }
+  .steps .n { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--line-strong); display: flex;
+    align-items: center; justify-content: center; font-weight: 700; font-size: .72rem; background: var(--surface); }
+  .steps .st.on { color: var(--sage-deep); font-weight: 600; }
+  .steps .st.on .n { background: var(--sage); border-color: var(--sage); color: #fff; }
+  .steps .bar { width: 46px; height: 1.5px; background: var(--line-strong); }
+
+  .hero { text-align: center; margin-bottom: 40px; }
+  .hero h1 { font-family: var(--serif); font-size: 1.9rem; font-weight: 600; letter-spacing: .12em; margin: 0 0 10px; }
+  .hero p { color: var(--ink-soft); font-size: .92rem; margin: 0 0 26px; }
+  .btn-primary { background: var(--sage); color: #fff; border: none; border-radius: 12px; padding: 14px 42px;
+    font-weight: 700; font-size: .95rem; letter-spacing: .08em; box-shadow: var(--sh-sm); transition: background .15s; }
+  .btn-primary:hover { background: var(--sage-deep); }
+
+  .sec-title { font-size: .78rem; letter-spacing: .2em; color: var(--ink-faint); font-weight: 700; margin: 0 0 14px; }
+  .session-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+  .session-item { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px;
+    display: flex; align-items: center; gap: 14px; box-shadow: var(--sh-sm); transition: box-shadow .18s, border-color .18s; }
+  .session-item:hover { box-shadow: var(--sh-md); border-color: var(--line-strong); }
+  .session-item .dot { width: 38px; height: 38px; border-radius: 12px; background: var(--sage-tint); color: var(--sage-deep);
+    display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-weight: 600; }
+  .session-item .t { flex: 1; font-weight: 600; font-size: .94rem; }
+  .session-item .t small { display: block; font-weight: 400; color: var(--ink-faint); font-size: .76rem; margin-top: 2px; }
+  .session-item .open { color: var(--sage-deep); background: var(--sage-tint); border: none; border-radius: 10px; padding: 8px 16px; font-size: .8rem; font-weight: 700; }
+
+  .trust-foot { margin-top: 48px; display: flex; justify-content: center; gap: 26px; padding: 18px 0 0;
+    border-top: 1px solid var(--line); font-size: .74rem; color: var(--ink-faint); flex-wrap: wrap; }
+  .trust-foot span { display: inline-flex; align-items: center; gap: 7px; }
+  .trust-foot svg { width: 15px; height: 15px; color: var(--sage); }
+
+  /* --- カード選択 --- */
+  .domain-head { display: flex; align-items: center; gap: 10px; margin: 30px 0 14px; }
+  .domain-head .pill { display: inline-flex; align-items: center; gap: 7px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 999px; padding: 5px 14px; font-weight: 700; font-size: .84rem; }
+  .domain-head .pill i { width: 9px; height: 9px; border-radius: 50%; background: var(--dc, var(--sage)); }
+  .domain-head .cnt { font-size: .74rem; color: var(--ink-faint); }
+  .domain-head::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 16px; }
+  .card-pick { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 16px; cursor: pointer; box-shadow: var(--sh-sm); transition: transform .14s, box-shadow .18s, border-color .18s; }
+  .card-pick:hover { transform: translateY(-2px); box-shadow: var(--sh-md); }
+  .card-pick.selected { border-color: var(--sage); box-shadow: 0 0 0 3px var(--sage-tint), var(--sh-md); }
+  .card-pick .check { position: absolute; top: 12px; right: 12px; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--sage); color: #fff; font-size: .72rem; font-weight: 700; display: none; align-items: center; justify-content: center; }
+  .card-pick.selected .check { display: flex; }
+  .card-pick .cf-head { margin-right: 26px; }
+
+  .card-face { display: flex; gap: 14px; text-align: left; color: var(--card-ink); }
+  .cf-art { position: relative; width: 45%; flex: none; align-self: center; overflow: hidden; border-radius: 10px; }
+  .cf-art img { display: block; width: 100%; aspect-ratio: 832/512; object-fit: cover; }
+  .cf-word { position: absolute; font-family: var(--serif); font-weight: 600; color: #3a362e; font-size: .8rem;
+    letter-spacing: .08em; line-height: 1.35; white-space: nowrap;
+    text-shadow: 0 0 8px rgba(248,244,234,.95), 0 0 3px rgba(248,244,234,.9); }
+  .cf-word .wsub { display: block; font-size: .64em; color: #6e675a; letter-spacing: .14em; }
+  .cf-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .cf-head { display: flex; align-items: center; gap: 8px; }
+  .cf-tag { font-size: .62rem; font-weight: 700; letter-spacing: .1em; color: var(--dc, var(--sage));
+    background: color-mix(in srgb, var(--dc, var(--sage)) 11%, #fff); border-radius: 999px; padding: 2px 9px; }
+  .cf-num { font-size: .68rem; color: var(--ink-faint); font-weight: 700; letter-spacing: .08em; }
+  .cf-name { font-family: var(--serif); font-weight: 600; font-size: .95rem; letter-spacing: .04em; margin: 6px 0 4px; }
+  .cf-desc { font-size: .75rem; color: var(--card-ink-soft); line-height: 1.65; flex: 1; }
+
+  .pick-bar { position: sticky; bottom: 0; margin-top: 30px; background: rgba(255,255,255,.9); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; padding: 13px 26px; border-radius: 0; }
+  .pick-count { font-size: .84rem; color: var(--ink-soft); }
+  .pick-count b { font-size: 1.25rem; color: var(--ink); margin-right: 2px; }
+
+  /* --- 机(静かな和紙の面) --- */
+  .desk { position: relative; height: 620px; overflow: hidden;
+    background:
+      radial-gradient(100% 80% at 50% 0%, #ffffff 0%, #eef2f0 55%, #dfe7e3 100%); }
+  .desk::before { content: ""; position: absolute; inset: 0; opacity: .5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.42 0 0 0 0 0.40 0 0 0 0.03 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23p)'/%3E%3C/svg%3E"); }
+  .desk::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(90% 80% at 50% 45%, transparent 60%, rgba(44,58,61,.07) 100%); }
+  .toolbar { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); z-index: 5; display: flex; align-items: center; gap: 12px;
+    background: rgba(255,255,255,.88); backdrop-filter: blur(12px); border: 1px solid var(--line);
+    border-radius: 14px; padding: 9px 16px; box-shadow: var(--sh-md); font-size: .78rem; color: var(--ink-soft); }
+  .toolbar .tt { font-weight: 700; font-size: .84rem; color: var(--ink); padding-right: 12px; border-right: 1px solid var(--line); }
+  .toolbar .range { width: 90px; height: 4px; background: var(--line); border-radius: 99px; position: relative; }
+  .toolbar .range i { position: absolute; left: 55%; top: 50%; width: 15px; height: 15px; border-radius: 50%;
+    background: var(--sage); transform: translate(-50%,-50%); border: 2.5px solid #fff; box-shadow: 0 1px 4px rgba(44,58,61,.25); }
+  .toolbar .submit { background: var(--sage); color: #fff; border: none; border-radius: 10px; padding: 8px 18px;
+    font-size: .78rem; font-weight: 700; letter-spacing: .06em; }
+  .card-piece { position: absolute; width: 252px; background: var(--card); border: 1px solid var(--line-strong); border-radius: 14px;
+    padding: 14px; color: var(--card-ink); box-shadow: 0 3px 6px rgba(44,58,61,.08), 0 18px 34px rgba(44,58,61,.13); }
+  .card-piece .cf-desc { font-size: .63rem; }
+  .card-piece .cf-word { font-size: .6rem; }
+  .card-piece .cf-name { font-size: .82rem; margin: 5px 0 3px; }
+</style>
+</head>
+<body>
+<nav class="mock-nav"><b>案C ── カーム・プロフェッショナル</b><span>医療・ウェルネスサービスの清潔感:常設ロゴバー・ステップ表示・プライバシーバッジ</span><a href="index.html">← 3案の比較へ戻る</a></nav>
+
+<!-- ============ 画面1: ホーム ============ -->
+<section class="screen">
+  <p class="screen-label">SCREEN 01 ── ホーム</p>
+  <div class="frame">
+    <div class="chrome"><i></i><i></i><i></i><span class="url">schema-therapy-card ── ホーム</span></div>
+    <div class="app">
+      <div class="appbar">
+        <span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4.4-2.6-8-5.8-8-9.9C4 7.9 6 6 8.4 6c1.5 0 2.9.8 3.6 2 .7-1.2 2.1-2 3.6-2C18 6 20 7.9 20 11.1c0 4.1-3.6 7.3-8 9.9z"/><path d="M8.5 12.5h2l1-2.4 1.6 4 1-1.6h1.4"/></svg></span>
+        <div class="name">スキーマ療法カード<small>SCHEMA THERAPY CARD ── WORKSHOP</small></div>
+        <div class="right">
+          <span class="badge-local"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>データは端末内のみ</span>
+        </div>
+      </div>
+      <div class="wrap">
+        <div class="steps">
+          <span class="st on"><span class="n">1</span>カードを選ぶ</span><span class="bar"></span>
+          <span class="st"><span class="n">2</span>机に並べる</span><span class="bar"></span>
+          <span class="st"><span class="n">3</span>眺めて気づく</span>
+        </div>
+        <div class="hero">
+          <h1>いまの自分に響くカードを、机に並べる。</h1>
+          <p>ヤングの18の早期不適応スキーマから、気になるものを選んで内省するワークです。</p>
+          <button class="btn-primary">ワークを始める</button>
+        </div>
+        <p class="sec-title">これまでのワーク</p>
+        <div class="session-list">
+          <div class="session-item"><span class="dot">五</span><div class="t">7月19日のワーク<small>カード 5枚 ── 2026年7月19日 14:02</small></div><button class="open">ひらく</button></div>
+          <div class="session-item"><span class="dot">三</span><div class="t">初回セッション<small>カード 3枚 ── 2026年7月12日 10:31</small></div><button class="open">ひらく</button></div>
+        </div>
+        <div class="trust-foot">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>サーバー送信なし ── データは端末内に保存</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Young の18スキーマ分類に準拠</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v5c0 4.4-3 8-7 9-4-1-7-4.6-7-9V7z"/></svg>ワークショップでの利用を想定した設計</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 画面2: カード選択 ============ -->
+<section class="screen">
+  <p class="screen-label">SCREEN 02 ── カードを選ぶ(ステップ 1/3)</p>
+  <div class="frame">
+    <div class="chrome"><i></i><i></i><i></i><span class="url">schema-therapy-card ── カードを選ぶ</span></div>
+    <div class="app">
+      <div class="appbar">
+        <span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4.4-2.6-8-5.8-8-9.9C4 7.9 6 6 8.4 6c1.5 0 2.9.8 3.6 2 .7-1.2 2.1-2 3.6-2C18 6 20 7.9 20 11.1c0 4.1-3.6 7.3-8 9.9z"/><path d="M8.5 12.5h2l1-2.4 1.6 4 1-1.6h1.4"/></svg></span>
+        <div class="name">スキーマ療法カード<small>SCHEMA THERAPY CARD ── WORKSHOP</small></div>
+        <div class="right"><span class="badge-local"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>データは端末内のみ</span></div>
+      </div>
+      <div class="wrap">
+        <div class="steps">
+          <span class="st on"><span class="n">1</span>カードを選ぶ</span><span class="bar"></span>
+          <span class="st"><span class="n">2</span>机に並べる</span><span class="bar"></span>
+          <span class="st"><span class="n">3</span>眺めて気づく</span>
+        </div>
+        <div class="domain-head" style="--dc:var(--dom-disconnection)"><span class="pill"><i></i>断絶と拒絶</span><span class="cnt">5枚のうち 3枚を表示</span></div>
+        <div class="grid">
+          <div class="card-pick selected" style="--dc:var(--dom-disconnection)">
+            <span class="check">✓</span>
+            <div class="card-face">
+              <div class="cf-art"><img src="../img/abandonment.jpg" alt=""><span class="cf-word" style="right:6%;top:9%;text-align:right">見捨てられ<span class="wsub">不安定</span></span></div>
+              <div class="cf-body">
+                <div class="cf-head"><span class="cf-tag">断絶と拒絶</span><span class="cf-num">No.01</span></div>
+                <div class="cf-name">見捨てられ／不安定</div>
+                <div class="cf-desc">支えてくれる人はいずれ去る、頼れない、と感じる。人との別れや不在に強い不安を覚える。</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-pick" style="--dc:var(--dom-disconnection)">
+            <span class="check">✓</span>
+            <div class="card-face">
+              <div class="cf-art"><img src="../img/mistrust.jpg" alt=""><span class="cf-word" style="left:50%;bottom:7%;transform:translateX(-50%);text-align:center">不信／虐待</span></div>
+              <div class="cf-body">
+                <div class="cf-head"><span class="cf-tag">断絶と拒絶</span><span class="cf-num">No.02</span></div>
+                <div class="cf-name">不信／虐待</div>
+                <div class="cf-desc">他人はいつか自分を傷つけ、利用し、裏切ると身構える。人の善意を素直に受け取りにくい。</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-pick" style="--dc:var(--dom-disconnection)">
+            <span class="check">✓</span>
+            <div class="card-face">
+              <div class="cf-art"><img src="../img/defectiveness.jpg" alt=""><span class="cf-word" style="left:50%;top:9%;transform:translateX(-50%);text-align:center">欠陥／恥</span></div>
+              <div class="cf-body">
+                <div class="cf-head"><span class="cf-tag">断絶と拒絶</span><span class="cf-num">No.04</span></div>
+                <div class="cf-name">欠陥／恥</div>
+                <div class="cf-desc">自分は欠けていて価値がない、知られたら見捨てられると感じる。強い恥や自己否定を伴う。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="domain-head" style="--dc:var(--dom-vigilance);margin-top:32px"><span class="pill"><i></i>過剰警戒と抑制</span><span class="cnt">4枚のうち 3枚を表示</span></div>
+        <div class="grid">
+          <div class="card-pick" style="--dc:var(--dom-vigilance)">
+            <span class="check">✓</span>
+            <div class="card-face">
+              <div class="cf-art"><img src="../img/unrelenting-standards.jpg" alt=""><span class="cf-word" style="left:6%;top:34%">厳密な基準<span class="wsub">過度の批判</span></span></div>
+              <div class="cf-body">
+                <div class="cf-head"><span class="cf-tag">過剰警戒と抑制</span><span class="cf-num">No.17</span></div>
+                <div class="cf-name">厳密な基準／過度の批判</div>
+                <div class="cf-desc">非常に高い基準を自分(や他者)に課し、決して十分と思えず自分を厳しく批判する。</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-pick selected" style="--dc:var(--dom-vigilance)">
+            <span class="check">✓</span>
+            <div class="card-face">
+              <div class="cf-art"><img src="../img/emotional-inhibition.jpg" alt=""><span class="cf-word" style="right:6%;top:8%;text-align:right">感情抑制</span></div>
+              <div class="cf-body">
+                <div class="cf-head"><span class="cf-tag">過剰警戒と抑制</span><span class="cf-num">No.16</span></div>
+                <div class="cf-name">感情抑制</div>
+                <div class="cf-desc">怒り・喜び・弱さなどの感情や衝動を、恥や制御のために抑え込んでしまう。</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-pick" style="--dc:var(--dom-vigilance)">
+            <span class="check">✓</span>
+            <div class="card-face">
+              <div class="cf-art"><img src="../img/punitiveness.jpg" alt=""><span class="cf-word" style="left:8%;bottom:10%">罰</span></div>
+              <div class="cf-body">
+                <div class="cf-head"><span class="cf-tag">過剰警戒と抑制</span><span class="cf-num">No.18</span></div>
+                <div class="cf-name">罰</div>
+                <div class="cf-desc">過ちは厳しく罰せられるべきだと考え、自分や他者のミスに寛容になれない。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="pick-bar">
+          <span class="pick-count"><b>2</b> 枚 えらんでいます</span>
+          <button class="btn-primary" style="padding:11px 34px">机に並べる →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 画面3: 机 ============ -->
+<section class="screen">
+  <p class="screen-label">SCREEN 03 ── 机(ワーク) ── 明るい和紙の面・静かな影</p>
+  <div class="frame">
+    <div class="chrome"><i></i><i></i><i></i><span class="url">schema-therapy-card ── 机</span></div>
+    <div class="desk">
+      <div class="toolbar">
+        <span class="tt">7月19日のワーク</span>
+        <span>ズーム</span><span class="range"><i></i></span>
+        <span>チルト</span><span class="range"><i style="left:30%"></i></span>
+        <button class="submit">講師に提出</button>
+      </div>
+      <div class="card-piece" style="left:16%;top:24%;transform:rotate(-2deg)">
+        <div class="card-face">
+          <div class="cf-art"><img src="../img/abandonment.jpg" alt=""><span class="cf-word" style="right:6%;top:9%;text-align:right">見捨てられ<span class="wsub">不安定</span></span></div>
+          <div class="cf-body">
+            <div class="cf-head"><span class="cf-tag" style="--dc:var(--dom-disconnection)">断絶と拒絶</span></div>
+            <div class="cf-name">見捨てられ／不安定</div>
+            <div class="cf-desc">支えてくれる人はいずれ去る、頼れない、と感じる。</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-piece" style="left:45%;top:47%;transform:rotate(1.4deg)">
+        <div class="card-face">
+          <div class="cf-art"><img src="../img/emotional-inhibition.jpg" alt=""><span class="cf-word" style="right:6%;top:8%;text-align:right">感情抑制</span></div>
+          <div class="cf-body">
+            <div class="cf-head"><span class="cf-tag" style="--dc:var(--dom-vigilance)">過剰警戒と抑制</span></div>
+            <div class="cf-name">感情抑制</div>
+            <div class="cf-desc">怒り・喜び・弱さなどの感情や衝動を、抑え込んでしまう。</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-piece" style="left:62%;top:16%;transform:rotate(2.6deg)">
+        <div class="card-face">
+          <div class="cf-art"><img src="../img/self-sacrifice.jpg" alt=""><span class="cf-word" style="right:7%;top:10%;text-align:right">自己犠牲</span></div>
+          <div class="cf-body">
+            <div class="cf-head"><span class="cf-tag" style="--dc:var(--dom-directedness)">他者への追従</span></div>
+            <div class="cf-name">自己犠牲</div>
+            <div class="cf-desc">他者の苦痛を放っておけず、自分の必要を後回しにして尽くしすぎてしまう。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

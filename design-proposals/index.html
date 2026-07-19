@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>デザイン提案 — 有料ワークショップ品質の3方向</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700&display=swap">
+<style>
+  :root {
+    --ink: #26292b; --ink-soft: #62676b; --paper: #f2f0ea; --line: #dcd8cd;
+    --serif: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+    --sans: system-ui, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--sans); background: var(--paper); color: var(--ink); line-height: 1.7; }
+  header { text-align: center; padding: 52px 20px 8px; }
+  header .over { font-size: .68rem; letter-spacing: .4em; text-indent: .4em; color: #8d6f43; margin: 0 0 12px; }
+  h1 { font-family: var(--serif); font-weight: 600; font-size: 1.7rem; letter-spacing: .18em; margin: 0; }
+  header p.sub { color: var(--ink-soft); font-size: .88rem; margin: 12px 0 0; }
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 22px;
+    max-width: 1360px; margin: 40px auto 70px; padding: 0 22px; }
+  .col { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+    box-shadow: 0 2px 6px rgba(38,41,43,.06), 0 14px 34px rgba(38,41,43,.08); display: flex; flex-direction: column;
+    position: relative; transition: transform .15s ease, box-shadow .2s ease; }
+  .col:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(38,41,43,.08), 0 22px 46px rgba(38,41,43,.13); }
+  .col .reco { position: absolute; top: 14px; right: 14px; z-index: 3; background: #2f6b5f; color: #fff;
+    font-size: .68rem; font-weight: 700; letter-spacing: .14em; border-radius: 999px; padding: 4px 13px; }
+  .col h2 { font-family: var(--serif); font-size: 1.08rem; font-weight: 600; letter-spacing: .1em; margin: 0; padding: 18px 20px 2px; }
+  .col p.concept { color: var(--ink-soft); font-size: .8rem; margin: 4px 0 12px; padding: 0 20px; min-height: 3.6em; }
+  .preview { position: relative; height: 430px; overflow: hidden; border-top: 1px solid var(--line); background: #e9e6de; flex: none; }
+  .preview iframe { width: 1240px; height: 1540px; border: 0; transform: scale(.348); transform-origin: 0 0; pointer-events: none; }
+  .preview a.veil { position: absolute; inset: 0; display: block; }
+  .col .foot { display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-top: 1px solid var(--line); margin-top: auto; }
+  .col .foot .kw { flex: 1; font-size: .7rem; color: #97917f; letter-spacing: .06em; }
+  .col .foot a.go { color: #2f6b5f; font-weight: 700; font-size: .84rem; text-decoration: none; white-space: nowrap; }
+  .col .foot a.go:hover { text-decoration: underline; }
+  .note { text-align: center; color: #97917f; font-size: .74rem; padding: 0 20px 60px; }
+</style>
+</head>
+<body>
+<header>
+  <p class="over">DESIGN PROPOSAL ── WORKSHOP EDITION</p>
+  <h1>信頼のつくりかた、三案</h1>
+  <p class="sub">それぞれの案をクリックすると、実物大の画面モック(ホーム/カード選択/机)が開きます。</p>
+</header>
+
+<div class="cols">
+  <div class="col">
+    <span class="reco">推奨</span>
+    <h2>案A ── クリニカル・エディトリアル</h2>
+    <p class="concept">専門出版社の刊行物の佇まい。題字と二重罫、ローマ数字、奥付、精密なヘアライン。「きちんと編集された道具」であることが信頼になる。</p>
+    <div class="preview"><iframe src="a-clinical-editorial.html" loading="lazy" tabindex="-1" scrolling="no"></iframe><a class="veil" href="a-clinical-editorial.html" aria-label="案Aを開く"></a></div>
+    <div class="foot"><span class="kw">墨紺 × 象牙 × 真鍮 ── 明朝の題字と学術書の組版</span><a class="go" href="a-clinical-editorial.html">実物大で見る →</a></div>
+  </div>
+
+  <div class="col">
+    <h2>案B ── セミナールーム</h2>
+    <p class="concept">暗い会場に象牙のカードが浮かぶ。スポットライトと真鍮の金物。プロジェクタ投影や対面ワークの「場の格」が信頼になる。</p>
+    <div class="preview"><iframe src="b-seminar-room.html" loading="lazy" tabindex="-1" scrolling="no"></iframe><a class="veil" href="b-seminar-room.html" aria-label="案Bを開く"></a></div>
+    <div class="foot"><span class="kw">青緑墨 × 象牙 × 真鍮 ── 暗がりで発光する紙</span><a class="go" href="b-seminar-room.html">実物大で見る →</a></div>
+  </div>
+
+  <div class="col">
+    <h2>案C ── カーム・プロフェッショナル</h2>
+    <p class="concept">医療・ウェルネスサービスの清潔感。常設ロゴバー、3ステップ表示、プライバシーバッジ。構造の明快さと透明性が信頼になる。</p>
+    <div class="preview"><iframe src="c-calm-professional.html" loading="lazy" tabindex="-1" scrolling="no"></iframe><a class="veil" href="c-calm-professional.html" aria-label="案Cを開く"></a></div>
+    <div class="foot"><span class="kw">診療所の白 × スレート × セージ ── ステップと余白</span><a class="go" href="c-calm-professional.html">実物大で見る →</a></div>
+  </div>
+</div>
+
+<p class="note">モックはいずれも現行のカード画像・文言をそのまま使用。採用案が決まり次第、本体 index.html に(ダークモード含め)全面適用します。</p>
+</body>
+</html>
