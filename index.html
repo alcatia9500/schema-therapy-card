@@ -302,6 +302,46 @@
   .viewer-info .when { color: var(--ink-faint); font-size: .76rem; margin: 2px 0 8px; }
   .viewer-info .note { font-size: .84rem; color: var(--ink); white-space: pre-wrap; border-top: 1px solid var(--line); padding-top: 8px; }
   .viewer-info .note.empty { color: var(--ink-faint); font-style: italic; }
+
+  /* --- ライブ提出パネル(講師) --- */
+  .live-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+    padding: 16px 18px; margin: 18px 0 8px; box-shadow: var(--shadow-sm); }
+  .live-panel h3 { font-family: var(--serif); font-size: 1.02rem; margin: 0 0 8px; letter-spacing: .04em; }
+  .live-panel .live-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .live-code { font-family: var(--serif); font-size: 1.7rem; letter-spacing: .28em; color: var(--gold);
+    background: var(--gold-tint); border: 1px solid var(--gold-soft); border-radius: 12px; padding: 4px 14px 4px 20px; }
+  .live-link { font-size: .8rem; color: var(--ink); background: var(--btn-face); border: 1px solid var(--line);
+    border-radius: 10px; padding: 7px 10px; word-break: break-all; flex: 1; min-width: 200px; }
+  .live-status { display: inline-flex; align-items: center; gap: 7px; font-size: .82rem; color: var(--accent-deep); }
+  .live-status .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 0 var(--accent-tint);
+    animation: live-pulse 1.8s ease-out infinite; }
+  @keyframes live-pulse { 0%{ box-shadow: 0 0 0 0 rgba(111,154,145,.4);} 70%{ box-shadow: 0 0 0 10px rgba(111,154,145,0);} 100%{ box-shadow: 0 0 0 0 rgba(111,154,145,0);} }
+  .live-hint { color: var(--ink-soft); font-size: .8rem; margin: 8px 0 0; }
+
+  /* --- 名簿ランチャー(名前チップ) --- */
+  .roster-filter { width: 100%; font: inherit; color: var(--ink); background: var(--btn-face);
+    border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; margin: 18px 0 12px; }
+  .name-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .name-chip { display: inline-flex; align-items: center; gap: 8px; background: var(--surface); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 14px; padding: 12px 8px 12px 16px; box-shadow: var(--shadow-sm);
+    font-weight: 600; font-size: 1rem; }
+  .name-chip:hover { background: var(--btn-hover); border-color: var(--gold-soft); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .name-chip .cardnum { font-size: .72rem; color: var(--ink-faint); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .name-chip .chip-x { width: 24px; height: 24px; padding: 0; border-radius: 8px; font-size: .9rem; line-height: 1;
+    background: transparent; color: var(--ink-faint); border: 1px solid transparent; box-shadow: none; }
+  .name-chip .chip-x:hover { background: var(--gold-tint); color: var(--ink); }
+
+  /* --- ビューア名前スイッチャー --- */
+  .name-select { font: inherit; font-size: .85rem; color: var(--ink); background: var(--btn-face);
+    border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; max-width: 160px; }
+
+  /* --- トースト --- */
+  .toast { position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 20px); z-index: 200;
+    background: var(--ink); color: var(--paper); padding: 11px 18px; border-radius: 999px; font-size: .88rem;
+    box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none; transition: opacity .22s ease, transform .22s ease; }
+  .toast.show { opacity: .96; transform: translate(-50%, 0); }
+  .live-badge { display: inline-flex; align-items: center; gap: 6px; font-size: .76rem; color: var(--accent-deep);
+    background: var(--accent-tint); border-radius: 999px; padding: 3px 10px; }
 </style>
 </head>
 <body>
@@ -389,6 +429,8 @@ const state = {
   inbox: { version: 1, submissions: [] },  // 講師モードの受信箱(別ストレージ領域)
   currentSessionId: null,
   viewingId: null,   // 閲覧中の提出ID
+  live: null,        // ライブ提出: {role:"host"|"participant", code, peer?, started?}
+  liveError: null,
   screen: "home",
   storageOK: true,
   inboxOK: true,
@@ -471,9 +513,25 @@ function saveInbox() {
   }
 }
 
+// 提出ペイロードの形状検証(リンク経由・ライブ受信の共通ゲート)
+function validatePayload(p) {
+  return !!(p && p.v === 1 && Array.isArray(p.selectedCardIds) &&
+    typeof p.placements === "object" && p.placements !== null);
+}
+// 重複判定キー: 同じ人の同じ提出(名前+提出時刻)は1件に集約
+function dedupKey(p) { return sanitizeName(p && p.name) + "|" + ((p && p.submittedAt) || ""); }
+function findSubmissionByPayload(p) {
+  const k = dedupKey(p);
+  return state.inbox.submissions.find(s => dedupKey(s.payload) === k) || null;
+}
+
 function addSubmission(payload) {
-  state.inbox.submissions.push({ id: genId(), receivedAt: nowISO(), payload });
+  const existing = findSubmissionByPayload(payload);
+  if (existing) return existing;          // 重複は追加せず既存を返す
+  const rec = { id: genId(), receivedAt: nowISO(), payload };
+  state.inbox.submissions.push(rec);
   saveInbox();
+  return rec;
 }
 
 function deleteSubmission(id) {
@@ -528,26 +586,22 @@ async function decodeSubmission(frag) {
     jsonBytes = raw;
   }
   const payload = JSON.parse(new TextDecoder().decode(jsonBytes));
-  if (!payload || payload.v !== 1 || !Array.isArray(payload.selectedCardIds) ||
-      typeof payload.placements !== "object" || payload.placements === null) {
-    throw new Error("bad-shape");
-  }
+  if (!validatePayload(payload)) throw new Error("bad-shape");
   return payload;
 }
 
-// 貼り付けテキスト(URL全体でも断片でも)から提出リンクを取り込む
-async function ingestPastedLink(text) {
-  const m = /(s[01]=[A-Za-z0-9\-_]+)/.exec(text || "");
-  if (!m) { alert("提出リンクが見つかりませんでした。リンク全体を貼り付けてください。"); return; }
-  let payload;
-  try {
-    payload = await decodeSubmission(m[1]);
-  } catch (e) {
-    alert("リンクが不完全です。送信者にもう一度コピーしてもらってください。");
-    return;
+// 貼り付けテキスト(URL全体でも断片でも、複数まとめてでも)から提出リンクを取り込む
+async function ingestPastedLinks(text) {
+  const found = String(text || "").match(/s[01]=[A-Za-z0-9\-_]+/g);
+  if (!found || found.length === 0) { alert("提出リンクが見つかりませんでした。リンク全体を貼り付けてください。"); return; }
+  let ok = 0, ng = 0;
+  for (const frag of found) {
+    try { addSubmission(await decodeSubmission(frag)); ok++; }
+    catch (e) { ng++; }
   }
-  addSubmission(payload);
   render();
+  if (ok && !ng) toast(`${ok}件を追加しました`);
+  else alert(`${ok}件を追加しました。` + (ng ? `${ng}件は読み取れませんでした。` : ""));
 }
 
 // 受信箱の書き出し / 読み込み(ブラウザ移行・バックアップ用)
@@ -580,6 +634,115 @@ function importInboxFile(file) {
 
 // 入力の健全化(提出データからの復元・手貼り付け経路の両方を保護)
 function sanitizeName(v) { return String(v == null ? "" : v).slice(0, NAME_MAX); }
+
+// ==== 通知トースト ====
+function toast(msg) {
+  let t = document.getElementById("toast");
+  if (!t) { t = el("div", { id: "toast", class: "toast" }); document.body.appendChild(t); }
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("show"), 3000);
+}
+
+// ==== ライブ提出(WebRTC / PeerJS)====
+// 依存を増やさないため、ライブを使う瞬間にだけ PeerJS を遅延読込する。
+const PEERJS_SRC = "https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js";
+const LIVE_PREFIX = "stcard-live-";
+let _peerLoading = null;
+function loadPeerJS() {
+  if (typeof window !== "undefined" && window.Peer) return Promise.resolve(window.Peer);
+  if (_peerLoading) return _peerLoading;
+  _peerLoading = new Promise((resolve) => {
+    try {
+      const sc = document.createElement("script");
+      sc.src = PEERJS_SRC;
+      sc.onload = () => resolve((typeof window !== "undefined" && window.Peer) || null);
+      sc.onerror = () => resolve(null);
+      document.head.appendChild(sc);
+      setTimeout(() => resolve((typeof window !== "undefined" && window.Peer) || null), 10000); // 保険
+    } catch (e) { resolve(null); }
+  });
+  return _peerLoading;
+}
+
+function makeLiveCode() {
+  const AL = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // 紛らわしい I O 0 1 を除外
+  let c = "";
+  for (let i = 0; i < 5; i++) c += AL[Math.floor(Math.random() * AL.length)];
+  return c;
+}
+
+// 講師: ライブ受付を開始
+async function startLiveHost() {
+  state.liveError = null;
+  const Peer = await loadPeerJS();
+  if (!Peer) {
+    state.liveError = "ライブを開始できませんでした(ライブラリの読込に失敗)。リンク方式をご利用ください。";
+    render();
+    return;
+  }
+  hostAttempt(Peer, 0);
+}
+function hostAttempt(Peer, attempt) {
+  const code = makeLiveCode();
+  let peer;
+  try { peer = new Peer(LIVE_PREFIX + code); }
+  catch (e) { state.liveError = "ライブ開始でエラーが発生しました。"; render(); return; }
+
+  peer.on("open", () => {
+    state.live = { role: "host", code, peer, started: true, count: 0 };
+    state.liveError = null;
+    if (state.screen === "inbox") render();
+  });
+  peer.on("connection", (conn) => {
+    conn.on("data", (payload) => {
+      if (validatePayload(payload)) {
+        addSubmission(payload);
+        try { conn.send({ ok: true }); } catch (_) {}
+        toast(sanitizeName(payload.name) + " さんが提出しました");
+        if (state.screen === "inbox") render();
+      } else {
+        try { conn.send({ ok: false }); } catch (_) {}
+      }
+    });
+  });
+  peer.on("error", (err) => {
+    if (err && err.type === "unavailable-id" && attempt < 4) {   // コード衝突→再生成
+      try { peer.destroy(); } catch (_) {}
+      hostAttempt(Peer, attempt + 1);
+      return;
+    }
+    state.liveError = "ライブ接続でエラーが発生しました。再開してください。";
+    if (state.live && state.live.role === "host") state.live.started = false;
+    if (state.screen === "inbox") render();
+  });
+}
+
+// 参加者: ライブで直送を試みる。成功=true / 失敗(要フォールバック)=false
+function trySendLive(payload) {
+  const code = state.live && state.live.code;
+  if (!code) return Promise.resolve(false);
+  return loadPeerJS().then((Peer) => {
+    if (!Peer) return false;
+    return new Promise((resolve) => {
+      let peer, done = false;
+      const finish = (v) => { if (done) return; done = true; try { peer && peer.destroy(); } catch (_) {} resolve(v); };
+      const timer = setTimeout(() => finish(false), 8000);   // 8秒で諦めてフォールバック
+      try { peer = new Peer(); }
+      catch (e) { clearTimeout(timer); return resolve(false); }
+      peer.on("error", () => { clearTimeout(timer); finish(false); });
+      peer.on("open", () => {
+        let conn;
+        try { conn = peer.connect(LIVE_PREFIX + code, { reliable: true }); }
+        catch (e) { clearTimeout(timer); return finish(false); }
+        conn.on("open", () => { try { conn.send(payload); } catch (_) {} });
+        conn.on("data", (msg) => { if (msg && msg.ok) { clearTimeout(timer); finish(true); } });
+        conn.on("error", () => { clearTimeout(timer); finish(false); });
+      });
+    });
+  }).catch(() => false);
+}
 
 function getSession(id) {
   return state.db.sessions.find(s => s.id === id) || null;
@@ -674,6 +837,7 @@ function warningBanner() {
   else if (state.saveError) msg = "保存に失敗しました。空き容量をご確認ください。";
   else if (state.inboxCorrupted) { msg = "受信箱のデータが壊れていたため初期化しました(バックアップを退避済み)。"; state.inboxCorrupted = false; }
   else if (state.inboxSaveError) msg = "受信箱の保存に失敗しました。空き容量をご確認ください。";
+  else if (state.liveError) { msg = state.liveError; state.liveError = null; }
   if (!msg) return null;
   return el("div", { class:"banner" }, msg);
 }
@@ -758,67 +922,97 @@ function renderHome(app) {
   app.appendChild(wrap);
 }
 
-// ==== 講師モード: 受信箱一覧 ====
+// ==== 講師モード: 名簿ランチャー ====
 function fmtWhen(iso) {
   return typeof iso === "string" ? iso.slice(0, 16).replace("T", " ") : "";
+}
+function sortedSubmissions() {
+  return [...state.inbox.submissions].sort((a, b) => (b.receivedAt || "").localeCompare(a.receivedAt || ""));
+}
+
+// ライブ提出パネル(未開始=開始ボタン / 開始後=コード・参加リンク)
+function livePanel() {
+  const panel = el("div", { class:"live-panel" });
+  const live = state.live;
+  if (live && live.role === "host" && live.started) {
+    const url = location.origin + location.pathname + "#join=" + live.code;
+    const linkBox = el("div", { class:"live-link" }, url);
+    const copyBtn = el("button", { class:"secondary", onclick: async () => {
+      let ok = false; try { await navigator.clipboard.writeText(url); ok = true; } catch (_) {}
+      toast(ok ? "参加リンクをコピーしました" : "コピーできませんでした。手動で選択してください");
+    } }, "参加リンクをコピー");
+    panel.append(
+      el("h3", null, "ライブ提出 受付中"),
+      el("div", { class:"live-row" },
+        el("span", { class:"live-code" }, live.code),
+        el("span", { class:"live-status" }, el("span", { class:"dot" }), "参加者の「提出」がここに自動で並びます")),
+      el("div", { class:"live-row" }, linkBox, copyBtn),
+      el("p", { class:"live-hint" }, "このコード(または参加リンク)を最初に一度だけ Teams で共有してください。このタブは開いたままに。")
+    );
+  } else {
+    panel.append(
+      el("h3", null, "ライブ提出"),
+      el("p", { class:"live-hint" }, "受付を開始すると参加コードが出ます。参加者はコピー不要で、「提出」を押すとこの画面に直接届きます(うまく繋がらない場合はリンク方式に自動で切り替わります)。"),
+      el("div", { class:"live-row" },
+        el("button", { onclick: startLiveHost }, "ライブ提出を開始"))
+    );
+  }
+  return panel;
 }
 
 function renderInbox(app) {
   const wrap = el("div", { class:"wrap" });
   wrap.appendChild(el("div", { class:"page-head" },
-    el("h1", null, "講師モード ・ 受け取った提出"),
-    el("p", { class:"subtitle" }, "参加者から届いた提出リンクを開くと、ここに一覧されます。行を選ぶとその人の机を再現します。"),
+    el("h1", null, "講師モード ・ 名簿"),
+    el("p", { class:"subtitle" }, "名前をクリックすると、その人の机をそのまま再現します。"),
     el("div", { class:"ornament" }, el("i"))
   ));
 
-  // 手貼り付け + 書き出し/読み込み
-  const paste = el("textarea", { placeholder:"提出リンクをここに貼り付け(自動で開けない場合)" });
-  const addBtn = el("button", { onclick: () => { const t = paste.value; paste.value = ""; ingestPastedLink(t); } }, "受信箱に追加");
+  wrap.appendChild(livePanel());
+
+  // 名前フィルタ + 名簿チップ(絞り込みはチップだけ再描画)
+  const filter = el("input", { class:"roster-filter", type:"text", placeholder:"名前で絞り込み" });
+  const chipsWrap = el("div", { class:"name-chips" });
+  function drawChips() {
+    chipsWrap.innerHTML = "";
+    const q = filter.value.trim();
+    const subs = sortedSubmissions().filter(s => !q || sanitizeName(s.payload && s.payload.name).includes(q));
+    if (subs.length === 0) {
+      chipsWrap.appendChild(el("div", { class:"empty" },
+        el("span", { class:"emoji" }, "📨"),
+        state.inbox.submissions.length ? "該当する名前がありません。" : "まだ提出はありません。ライブ提出を開始するか、下にリンクを貼り付けてください。"));
+      return;
+    }
+    for (const sub of subs) {
+      const p = sub.payload || {};
+      const cardCount = Array.isArray(p.selectedCardIds) ? p.selectedCardIds.length : 0;
+      const chip = el("button", { class:"name-chip", onclick: () => { state.viewingId = sub.id; go("viewer"); } },
+        sanitizeName(p.name) || "名前なし",
+        el("span", { class:"cardnum" }, `${cardCount}枚`),
+        p.note ? el("span", { class:"sub-badge" }, "メモ") : null,
+        el("span", { class:"chip-x", title:"削除", onclick: (e) => { e.stopPropagation(); deleteSubmission(sub.id); } }, "×")
+      );
+      chipsWrap.appendChild(chip);
+    }
+  }
+  filter.addEventListener("input", drawChips);
+  wrap.appendChild(filter);
+  wrap.appendChild(chipsWrap);
+  drawChips();
+
+  // フォールバック手段: 手貼り付け(複数可) + 書き出し/読み込み
+  const paste = el("textarea", { placeholder:"提出リンクを貼り付け(複数まとめて可)" });
+  const addBtn = el("button", { class:"secondary", onclick: () => { const t = paste.value; paste.value = ""; ingestPastedLinks(t); } }, "リンクから追加");
   const fileInput = el("input", { type:"file", accept:"application/json", style:"display:none",
     onchange: (e) => { const f = e.target.files[0]; if (f) importInboxFile(f); e.target.value = ""; } });
   const importBtn = el("button", { class:"secondary", onclick: () => fileInput.click() }, "読み込み");
   const exportBtn = el("button", { class:"secondary", onclick: exportInbox, disabled: state.inbox.submissions.length === 0 }, "書き出し");
-
   wrap.appendChild(el("div", { class:"inbox-tools" },
     el("div", { class:"paste" }, paste),
     addBtn, exportBtn, importBtn, fileInput
   ));
   wrap.appendChild(el("p", { class:"inbox-note" },
-    "提出データは各リンクの中と、この端末のブラウザ内だけに保存されます。外部サーバーには送信されません。"));
-
-  const subs = [...state.inbox.submissions].sort((a, b) => (b.receivedAt || "").localeCompare(a.receivedAt || ""));
-  if (subs.length === 0) {
-    wrap.appendChild(el("div", { class:"empty" },
-      el("span", { class:"emoji" }, "📨"),
-      "まだ提出はありません。参加者から届いたリンクを開くか、上に貼り付けてください。"
-    ));
-  } else {
-    const list = el("div", { class:"session-list" });
-    for (const sub of subs) {
-      const p = sub.payload || {};
-      const cardCount = Array.isArray(p.selectedCardIds) ? p.selectedCardIds.length : 0;
-      const meta = el("div", { class:"meta" },
-        el("div", { class:"session-title" }, sanitizeName(p.name) || "名前なし",
-          p.note ? el("span", { class:"sub-badge" }, "メモあり") : null),
-        el("small", null, `${cardCount}枚 ・ 提出 ${fmtWhen(p.submittedAt) || fmtWhen(sub.receivedAt)}`)
-      );
-      if (cardCount) {
-        const chips = el("span", { class:"chips" });
-        p.selectedCardIds.slice(0, 8).forEach(cid => {
-          const sc = schemaById(cid);
-          if (sc) chips.appendChild(el("i", { class:"chip", style:`background:var(--dom-${sc.domain})` }));
-        });
-        if (cardCount > 8) chips.appendChild(el("span", { class:"chip-more" }, "+" + (cardCount - 8)));
-        meta.appendChild(chips);
-      }
-      list.appendChild(el("div", { class:"session-item" },
-        meta,
-        el("button", { onclick: () => { state.viewingId = sub.id; go("viewer"); } }, "机を見る"),
-        el("button", { class:"secondary", onclick: () => deleteSubmission(sub.id) }, "削除")
-      ));
-    }
-    wrap.appendChild(list);
-  }
+    "提出データはこの端末のブラウザ内だけに保存されます(ライブはP2P直送、リンクはリンク内)。外部サーバーには保存されません。"));
 
   wrap.appendChild(el("div", { class:"home-foot" },
     el("button", { class:"ghost", onclick: () => go("home") }, "← ホームへ")));
@@ -1045,12 +1239,37 @@ function buildToolbar(board) {
 
 function buildViewerToolbar(board) {
   const c = viewControls(board);
-  const back = el("button", { class:"ghost", onclick: () => go("inbox") }, "← 一覧に戻る");
+  const back = el("button", { class:"ghost", onclick: () => go("inbox") }, "← 名簿");
+
+  // 名前スイッチャー(一覧に戻らず前後の人へ即切替)
+  const subs = sortedSubmissions();
+  const sel = el("select", { class:"name-select", title:"提出者を選ぶ" });
+  subs.forEach((s) => {
+    const o = el("option", { value: s.id }, sanitizeName(s.payload && s.payload.name) || "名前なし");
+    if (s.id === state.viewingId) o.setAttribute("selected", "selected");
+    sel.appendChild(o);
+  });
+  sel.addEventListener("change", () => { state.viewingId = sel.value; render(); });
+  const prev = el("button", { class:"icon-btn", title:"前の人 (←)", onclick: () => switchViewer(-1) }, "◀");
+  const next = el("button", { class:"icon-btn", title:"次の人 (→)", onclick: () => switchViewer(1) }, "▶");
+
   return el("div", { class:"toolbar" },
     back,
+    el("span", { class:"group" }, prev, sel, next),
     el("span", { class:"spacer" }),
     c.zoomLabel, c.tiltLabel, c.reset
   );
+}
+
+// 名簿順で前後の提出へ切替(端は循環)
+function switchViewer(delta) {
+  const subs = sortedSubmissions();
+  if (subs.length === 0) return;
+  const idx = subs.findIndex(s => s.id === state.viewingId);
+  if (idx < 0) { state.viewingId = subs[0].id; render(); return; }
+  const ni = (idx + delta + subs.length) % subs.length;
+  state.viewingId = subs[ni].id;
+  render();
 }
 
 function nudgeZoom(board, delta) {
@@ -1172,11 +1391,13 @@ function openSubmitDialog(session) {
   let prevName = "";
   try { prevName = sessionStorage.getItem("stc.lastName") || ""; } catch (_) {}
 
+  const isLive = !!(state.live && state.live.code);
+
   const nameInput = el("input", { type:"text", maxlength:String(NAME_MAX), value:prevName, placeholder:"お名前(必須)" });
   const nameCounter = el("div", { class:"counter" });
   const noteInput = el("textarea", { maxlength:String(NOTE_MAX), placeholder:"このワークで気づいたこと(任意)" });
   const noteCounter = el("div", { class:"counter" });
-  const makeBtn = el("button", null, "提出リンクを作成");
+  const makeBtn = el("button", null, isLive ? "講師に提出する" : "提出リンクを作成");
   const cancelBtn = el("button", { class:"secondary", onclick: close }, "閉じる");
 
   const refresh = () => {
@@ -1201,22 +1422,34 @@ function openSubmitDialog(session) {
       view: { zoom: session.view.zoom, tilt: session.view.tilt, panX: session.view.panX, panY: session.view.panY },
     };
     makeBtn.disabled = true;
-    makeBtn.textContent = "作成中…";
+
+    // ライブ参加中ならまずP2P直送を試みる(成功でコピー不要)
+    if (isLive) {
+      makeBtn.textContent = "送信中…";
+      let sent = false;
+      try { sent = await trySendLive(payload); } catch (_) { sent = false; }
+      if (sent) { showSubmitDone(modal, name); return; }
+      // 失敗 → リンク方式にフォールバック
+    }
+
+    makeBtn.textContent = "リンク作成中…";
     let frag;
     try {
       frag = await encodeSubmission(payload);
     } catch (e) {
-      makeBtn.textContent = "提出リンクを作成"; makeBtn.disabled = false;
-      alert("リンクの作成に失敗しました。もう一度お試しください。");
+      makeBtn.textContent = isLive ? "講師に提出する" : "提出リンクを作成"; makeBtn.disabled = false;
+      alert("提出の作成に失敗しました。もう一度お試しください。");
       return;
     }
     const url = location.origin + location.pathname + "#" + frag;
-    showSubmitResult(modal, url, name);
+    showSubmitResult(modal, url, name, isLive);
   });
 
   modal.append(
     el("h2", null, "講師に提出"),
-    el("p", { class:"hint" }, "名前を入れて提出リンクを作成し、Teams やメールで講師に送ってください。"),
+    el("p", { class:"hint" }, isLive
+      ? `ライブ提出に参加中(コード ${state.live.code})。「講師に提出する」を押すと、その場で講師の画面に届きます。`
+      : "名前を入れて提出リンクを作成し、Teams やメールで講師に送ってください。"),
     el("div", { class:"field" }, el("label", null, "お名前"), nameInput, nameCounter),
     el("div", { class:"field" }, el("label", null, "気づきメモ(任意)"), noteInput, noteCounter),
     el("div", { class:"modal-actions" }, cancelBtn, makeBtn)
@@ -1226,7 +1459,18 @@ function openSubmitDialog(session) {
   nameInput.focus();
 }
 
-function showSubmitResult(modal, url, name) {
+// ライブ直送が成功したときの完了表示
+function showSubmitDone(modal, name) {
+  modal.innerHTML = "";
+  modal.append(
+    el("h2", null, "提出しました"),
+    el("p", { class:"hint" }, `${name} さんの机を講師にお届けしました。ありがとうございました。`),
+    el("div", { class:"modal-actions" },
+      el("button", { onclick: () => { const b = modal.closest(".modal-backdrop"); if (b) b.remove(); } }, "閉じる"))
+  );
+}
+
+function showSubmitResult(modal, url, name, wasFallback) {
   modal.innerHTML = "";
   const box = el("textarea", { class:"link-box", readonly:"readonly" }, url);
   box.value = url;
@@ -1247,19 +1491,34 @@ function showSubmitResult(modal, url, name) {
     } }, "送る(共有)");
     actions.appendChild(shareBtn);
   }
-  actions.append(copyBtn, el("button", { class:"secondary", onclick: () => modal.closest(".modal-backdrop").remove() }, "閉じる"));
+  actions.append(copyBtn, el("button", { class:"secondary", onclick: () => { const b = modal.closest(".modal-backdrop"); if (b) b.remove(); } }, "閉じる"));
 
   modal.append(
-    el("h2", null, "提出リンクができました"),
-    el("p", { class:"hint" }, "このリンクを Teams やメールで講師に送ってください。講師が開くと受信箱に登録されます。"),
+    el("h2", null, wasFallback ? "うまく直接送れませんでした" : "提出リンクができました"),
+    el("p", { class:"hint" }, wasFallback
+      ? "回線の都合でライブ送信ができませんでした。代わりに、このリンクを Teams やメールで講師に送ってください。"
+      : "このリンクを Teams やメールで講師に送ってください。講師が開くと名簿に登録されます。"),
     box, okMsg, actions
   );
   box.focus(); box.select();
 }
 
-// ==== 提出リンクの受信(URLフラグメント) ====
+// ==== URLフラグメントの受信(提出リンク #s / 参加リンク #join) ====
 async function handleIncomingHash() {
   const hash = (location.hash || "").slice(1);
+
+  // 参加リンク: 参加者としてライブコードを保持
+  const jm = /^join=([A-Za-z0-9]+)$/.exec(hash);
+  if (jm) {
+    try { history.replaceState(null, "", location.pathname + location.search); } catch (_) { location.hash = ""; }
+    const code = jm[1].toUpperCase();
+    state.live = { role: "participant", code };
+    try { sessionStorage.setItem("stc.liveCode", code); } catch (_) {}
+    toast("ライブ提出に参加中(コード " + code + ")");
+    render();
+    return;
+  }
+
   if (!/^s[01]=/.test(hash)) return;
   // 個人データを履歴やブックマークに残さないよう、URLから即座に取り除く
   try { history.replaceState(null, "", location.pathname + location.search); } catch (_) { location.hash = ""; }
@@ -1274,28 +1533,41 @@ async function handleIncomingHash() {
     render();
     return;
   }
-  const who = sanitizeName(payload.name) || "名前なし";
-  if (confirm(`${who} さんの提出を受け取りました。受信箱に保存しますか?`)) {
-    addSubmission(payload);
-    go("inbox");
-  } else {
-    render();
-  }
+  // 直行: 確認・一覧を挟まず、その人の机をそのまま表示(自動保存・重複排除)
+  const rec = addSubmission(payload);
+  state.viewingId = rec.id;
+  go("viewer");
 }
 
 // ==== 起動 ====
-const _incoming = /^s[01]=/.test((location.hash || "").slice(1));
+const _hash = (location.hash || "").slice(1);
+const _incomingSub = /^s[01]=/.test(_hash);
+const _incomingJoin = /^join=/.test(_hash);
 loadDB();
 loadInbox();
-if (state.db.sessions.length === 0 && !_incoming) {
+// リロード時に参加者ライブコードを復帰(#join を挟まないケース)
+if (!_incomingSub && !_incomingJoin) {
+  try { const c = sessionStorage.getItem("stc.liveCode"); if (c) state.live = { role: "participant", code: c }; } catch (_) {}
+}
+if (state.db.sessions.length === 0 && !_incomingSub) {
   state.currentSessionId = createSession();
   state.screen = "select";
 } else {
   state.screen = "home";
 }
 render();
-if (_incoming) handleIncomingHash();
+if (_incomingSub || _incomingJoin) handleIncomingHash();
 window.addEventListener("hashchange", handleIncomingHash);
+
+// ビューアでのキーボード操作(←/→ で前後の人、Esc で名簿へ)
+document.addEventListener("keydown", (e) => {
+  if (state.screen !== "viewer") return;
+  const tag = (e.target && e.target.tagName) || "";
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+  if (e.key === "ArrowRight") switchViewer(1);
+  else if (e.key === "ArrowLeft") switchViewer(-1);
+  else if (e.key === "Escape") go("inbox");
+});
 </script>
 </body>
 </html>
