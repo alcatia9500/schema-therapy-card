@@ -194,11 +194,11 @@
     filter: sepia(.08) saturate(.92) contrast(1.02);
     user-select: none; -webkit-user-drag: none; pointer-events: none; }
   .cf-word { position: absolute; font-family: var(--serif); font-weight: 600; color: #3a362e;
-    font-size: .8rem; letter-spacing: .08em; line-height: 1.35; text-align: left; white-space: nowrap;
+    font-size: calc(.8rem * var(--wscale, 1)); letter-spacing: .08em; line-height: 1.35; text-align: left; white-space: nowrap;
     text-shadow: 0 0 8px rgba(248,244,234,.95), 0 0 3px rgba(248,244,234,.9); }
   .cf-word .wmain { display: block; font-size: 1em; }
   .cf-word .wsub { display: block; font-size: .64em; color: #6e675a; letter-spacing: .14em; margin-top: 1px; }
-  .card-piece .cf-word { font-size: .6rem; }
+  .card-piece .cf-word { font-size: calc(.6rem * var(--wscale, 1)); }
   .cf-sep { width: 100%; height: 0; border-top: 1px solid var(--hairline); margin: 8px 0; position: relative; flex: none; }
   .cf-sep::after { content: ""; position: absolute; left: 0; top: -1px; width: 34px; border-top: 1px solid var(--brass-soft); }
   .cf-desc { font-size: .74rem; color: var(--card-ink-soft); line-height: 1.65; flex: 1; }
@@ -460,7 +460,7 @@ const SCHEMAS = [
     art:{ pos:"left:50%;top:9%;transform:translateX(-50%);text-align:center", main:"権利要求", sub:"尊大" } },
   { id:"insufficient-self-control", name:"自制と自律の欠如", domain:"limits",
     desc:"退屈や不快に耐えるのが難しく、衝動や感情を抑えて目標を追うのが苦手。",
-    art:{ pos:"right:6%;top:10%;text-align:right;font-size:.78em", main:"自制と自律の欠如" } },
+    art:{ pos:"right:6%;top:10%;text-align:right;--wscale:.78", main:"自制と自律の欠如" } },
   { id:"subjugation", name:"服従", domain:"directedness",
     desc:"衝突や見捨てを避けるため、自分の欲求や感情を抑えて他者に従ってしまう。",
     art:{ pos:"left:6%;top:38%", main:"服従" } },
@@ -469,7 +469,7 @@ const SCHEMAS = [
     art:{ pos:"right:7%;top:10%;text-align:right", main:"自己犠牲" } },
   { id:"approval-seeking", name:"評価と承認の希求", domain:"directedness",
     desc:"他者からの評価・承認を過度に求め、それに合わせて自分を形づくってしまう。",
-    art:{ pos:"left:5%;top:8%;font-size:.78em", main:"評価と承認の希求" } },
+    art:{ pos:"left:5%;top:8%;--wscale:.78", main:"評価と承認の希求" } },
   { id:"negativity", name:"否定／悲観", domain:"vigilance",
     desc:"物事の悪い面ばかりに目が向き、うまくいかない未来を強く予期してしまう。",
     art:{ pos:"left:6%;top:10%", main:"否定／悲観" } },
