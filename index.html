@@ -37,8 +37,10 @@
     --dom-limits:        #7d6d94;
     --dom-directedness:  #5d7f9b;
     --dom-vigilance:     #77844e;
-    /* 机: 案Aの深い胡桃材 */
-    --desk-a: #4c3a27; --desk-b: #38291a; --desk-c: #241a10;
+    /* 机: エディトリアル路線に合わせた明るいウォームグレージュの紙面 */
+    --desk-a: #f1ebdd; --desk-b: #e7dfcd; --desk-c: #dcd2bd;
+    --desk-vignette: rgba(120,105,75,.12);   /* 端をほんのり締めるだけ */
+    --card-shadow: rgba(70,58,38,.16);        /* 明色面に置いたカードの影 */
     --ui-bg: rgba(247,244,236,.9);
     --surface: #fdfbf4;
     --btn-face: #fdfbf4; --btn-hover: #f1ece0;
@@ -46,7 +48,6 @@
     --shadow-md:    0 2px 4px rgba(20,24,28,.06), 0 10px 26px rgba(20,24,28,.10);
     --shadow-lg:    0 6px 16px rgba(20,24,28,.14), 0 22px 56px rgba(20,24,28,.20);
     --paper-tex: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.36 0 0 0 0 0.26 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23p)'/%3E%3C/svg%3E");
-    --wood-tex: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.14' numOctaves='4' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 0.28 0 0 0 0 0.20 0 0 0 0 0.10 0 0 0 0.22 0'/%3E%3C/filter%3E%3Crect width='420' height='420' filter='url(%23w)'/%3E%3C/svg%3E");
     --serif: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", serif;
     --sans: system-ui, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
   }
@@ -64,7 +65,9 @@
       --accent: #5fa093; --accent-deep: #4b8578; --accent-tint: rgba(95,160,147,.15);
       --dom-disconnection: #c08a5f; --dom-autonomy: #6fa196; --dom-limits: #9b8bb3;
       --dom-directedness: #7ba0bd; --dom-vigilance: #97a56a;
-      --desk-a: #3a2c1e; --desk-b: #281d12; --desk-c: #150e07;
+      --desk-a: #1c2127; --desk-b: #171b20; --desk-c: #12151a;
+      --desk-vignette: rgba(0,0,0,.45);
+      --card-shadow: rgba(0,0,0,.5);
       --ui-bg: rgba(23,27,31,.86);
       --surface: #21262b;
       --btn-face: #242a2f; --btn-hover: #2e353b;
@@ -221,42 +224,27 @@
   .pick-count { color: var(--ink-soft); font-size: .84rem; letter-spacing: .06em; font-variant-numeric: tabular-nums; }
   .pick-count b { color: var(--ink); font-size: 1.3rem; font-family: var(--serif); margin-right: 2px; }
 
-  /* --- ワークキャンバス(案A: 胡桃材の机) --- */
+  /* --- ワークキャンバス(明るい紙面の机) --- */
   .canvas-view {
     position: fixed; inset: 0; overflow: hidden; touch-action: none; perspective: 1300px;
-    background:
-      radial-gradient(120% 100% at 50% 0%, rgba(255,244,214,.10) 0%, transparent 55%),
-      var(--wood-tex),
-      radial-gradient(115% 90% at 50% 8%, var(--desk-a) 0%, var(--desk-b) 52%, var(--desk-c) 100%);
+    background-color: var(--desk-b);
+    background-image:
+      var(--paper-tex),
+      radial-gradient(130% 100% at 50% 2%, var(--desk-a) 0%, var(--desk-b) 55%, var(--desk-c) 100%);
   }
-  /* 強い内側ビネット(案A準拠) */
+  /* ごく控えめな内側ビネット。端をわずかに締めて中央に視線を集めるだけ。 */
   .canvas-view::after {
     content: ""; position: absolute; inset: 0; pointer-events: none;
-    box-shadow: inset 0 0 220px rgba(12,8,3,.55);
-    background: radial-gradient(80% 70% at 50% 40%, transparent 52%, rgba(12,8,3,.22) 100%);
+    box-shadow: inset 0 0 200px var(--desk-vignette);
   }
-  /* 深緑フェルトのマット。機能(pan/zoom)を壊さぬよう .stage の外(canvas-view直下)に
-     固定配置し、カードと一緒には動かさない。pointer-events:none でパン操作を透過。 */
-  .mat {
-    position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
-    width: min(1120px, 84%); height: min(640px, 78%); pointer-events: none; z-index: 0;
-    background:
-      radial-gradient(100% 100% at 50% 30%, rgba(255,255,255,.05), transparent 60%),
-      linear-gradient(160deg, #24382f, #1b2b24 70%);
-    border-radius: 14px; border: 1px solid rgba(180,154,110,.35);
-    box-shadow: inset 0 2px 14px rgba(0,0,0,.5), 0 6px 24px rgba(0,0,0,.45);
-  }
-  .mat::before { content: ""; position: absolute; inset: 9px; border: 1px solid rgba(180,154,110,.3); border-radius: 9px; }
-  .mat-label { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%);
-    font-family: var(--serif); font-size: .66rem; letter-spacing: .5em; text-indent: .5em; color: rgba(212,192,150,.5); }
   .stage { position: absolute; left: 50%; top: 50%; width: 0; height: 0; z-index: 1; transform-style: preserve-3d; will-change: transform; }
   .card-piece {
     position: absolute; width: 252px; min-height: 150px; margin-left: -126px; margin-top: -75px;
     background: var(--card); background-image: var(--paper-tex);
-    border: 1px solid rgba(60,50,35,.5); border-radius: 3px; padding: 13px 13px 10px;
+    border: 1px solid rgba(120,104,74,.4); border-radius: 3px; padding: 13px 13px 10px;
     box-shadow:
-      0 calc(3px + 16px * var(--tiltf, 0)) calc(12px + 22px * var(--tiltf, 0)) rgba(8,5,2,.5),
-      0 3px 6px rgba(8,5,2,.35);
+      0 calc(3px + 16px * var(--tiltf, 0)) calc(12px + 22px * var(--tiltf, 0)) var(--card-shadow),
+      0 2px 5px var(--card-shadow);
     cursor: grab; user-select: none;
     transition: box-shadow .18s ease, transform .12s ease;
   }
@@ -265,16 +253,16 @@
     border-radius: 0; pointer-events: none;
   }
   .card-piece .cf-desc { font-size: .63rem; }
-  .card-piece:hover { box-shadow: 0 calc(6px + 16px * var(--tiltf, 0)) calc(16px + 22px * var(--tiltf, 0)) rgba(35,26,12,.4), 0 3px 6px rgba(35,26,12,.2); }
+  .card-piece:hover { box-shadow: 0 calc(6px + 16px * var(--tiltf, 0)) calc(16px + 22px * var(--tiltf, 0)) var(--card-shadow), 0 3px 6px var(--card-shadow); }
   .card-piece.dragging { cursor: grabbing; transform: scale(1.05) rotate(.8deg);
-    box-shadow: 0 calc(10px + 18px * var(--tiltf, 0)) calc(24px + 24px * var(--tiltf, 0)) rgba(35,26,12,.45), 0 4px 8px rgba(35,26,12,.22); }
+    box-shadow: 0 calc(10px + 18px * var(--tiltf, 0)) calc(24px + 24px * var(--tiltf, 0)) var(--card-shadow), 0 4px 8px var(--card-shadow); }
 
   .toolbar {
     position: fixed; top: 14px; left: 14px; right: 14px; z-index: 10;
     display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
     background: var(--ui-bg); backdrop-filter: blur(12px);
     border: 1px solid var(--hairline-strong); border-radius: 6px; padding: 8px 14px;
-    box-shadow: 0 8px 26px rgba(12,8,3,.4);
+    box-shadow: var(--shadow-md);
   }
   .toolbar .spacer { flex: 1; }
   .toolbar .group { display: flex; align-items: center; gap: 6px; }
@@ -1261,9 +1249,6 @@ function positionPiece(piece, p) {
 // board から机(viewport)を組み立てる。session/提出のどちらでも同じ描画。
 function buildBoardView(board) {
   viewportEl = el("div", { class:"canvas-view" });
-  // 深緑フェルトのマット: canvas-view直下(stageの外)に固定配置し、pan/zoomに追従させない。
-  // pointer-events:none なので余白ドラッグのパン判定(target===viewport/stage)も阻害しない。
-  viewportEl.appendChild(el("div", { class:"mat" }, el("span", { class:"mat-label" }, "SCHEMA THERAPY")));
   stageEl = el("div", { class:"stage" });
   viewportEl.appendChild(stageEl);
 
